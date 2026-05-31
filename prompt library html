@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCIP Prompt Library — AFC Investigations Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #020c18;
+    --bg2:      #040e1c;
+    --bg3:      #060f1e;
+    --border:   #0d2340;
+    --border2:  #1a3a5c;
+    --accent:   #4a9eff;
+    --accent2:  #1a5a9c;
+    --text:     #e8f4ff;
+    --text2:    #cce4ff;
+    --text3:    #7aa8cc;
+    --text4:    #3a6a8a;
+    --text5:    #1a4a7a;
+    --mono:     'DM Mono', monospace;
+    --display:  'Syne', sans-serif;
+    --radius:   8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── HEADER ─────────────────────────────────── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(3,15,32,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px 18px;
+  }
+  .header-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .header-eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(20px, 3.5vw, 30px);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: var(--text4);
+    margin-top: 4px;
+  }
+  .header-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .header-count-label { font-size: 10px; color: var(--text5); margin-bottom: 2px; }
+  .header-count {
+    font-family: var(--display);
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  /* search */
+  .search-wrap {
+    position: relative;
+    margin-top: 16px;
+    max-width: 380px;
+  }
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text5);
+    font-size: 15px;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .search-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 12px 9px 33px;
+    color: var(--text2);
+    font-size: 12px;
+    font-family: var(--mono);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent2); }
+  .search-input::placeholder { color: var(--text5); }
+
+  /* ── LAYOUT ──────────────────────────────────── */
+  .layout {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 32px 60px;
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+  }
+
+  /* ── SIDEBAR ──────────────────────────────────── */
+  .sidebar {
+    width: 196px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 110px;
+  }
+  .sidebar-section-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text5);
+    margin-bottom: 10px;
+  }
+  .cat-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 7px 9px;
+    color: var(--text4);
+    font-size: 11.5px;
+    font-family: var(--mono);
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 2px;
+    transition: all 0.15s;
+  }
+  .cat-btn:hover { color: var(--text3); background: var(--bg2); border-color: var(--border); }
+  .cat-btn.active {
+    background: #071828;
+    border-color: var(--border2);
+    color: #7ac0ff;
+  }
+  .cat-count {
+    background: var(--bg2);
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 10px;
+    color: var(--text5);
+  }
+  .cat-btn.active .cat-count { background: #0d2f50; color: var(--accent); }
+
+  .how-box {
+    margin-top: 28px;
+    padding: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .how-box-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text5);
+    margin-bottom: 10px;
+  }
+  .how-step {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 6px;
+    color: var(--text4);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .how-step-num { color: var(--accent2); flex-shrink: 0; }
+
+  /* ── GRID ──────────────────────────────────────── */
+  .grid-area { flex: 1; min-width: 0; }
+  .grid-status {
+    font-size: 11px;
+    color: var(--text4);
+    margin-bottom: 14px;
+    min-height: 16px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+    gap: 13px;
+  }
+  .empty-state {
+    padding: 70px 0;
+    text-align: center;
+    color: var(--text5);
+  }
+  .empty-icon { font-size: 30px; margin-bottom: 10px; }
+  .empty-title { font-family: var(--display); font-size: 16px; color: var(--text4); margin-bottom: 4px; }
+
+  /* ── CARD ──────────────────────────────────────── */
+  .card {
+    background: linear-gradient(140deg, var(--bg3) 0%, #030810 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 17px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 70px; height: 70px;
+    background: radial-gradient(circle at top right, rgba(0,90,200,0.10), transparent);
+    pointer-events: none;
+  }
+  .card:hover {
+    border-color: #1a5a9c;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,80,180,0.14);
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .card-cat-badge {
+    background: #071828;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 9.5px;
+    color: var(--accent);
+    letter-spacing: 0.3px;
+  }
+  .card-arrow { color: var(--text5); font-size: 15px; }
+  .card-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--text2);
+    line-height: 1.3;
+    margin-bottom: 7px;
+  }
+  .card-desc {
+    font-size: 11.5px;
+    color: var(--text4);
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .card-footer { display: flex; gap: 5px; flex-wrap: wrap; }
+  .pill {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: #2a6a8a;
+    padding: 2px 7px;
+    font-size: 9.5px;
+  }
+  .pill-var { color: var(--accent2); }
+
+  /* ── MODAL OVERLAY ─────────────────────────────── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,8,20,0.87);
+    backdrop-filter: blur(10px);
+    z-index: 500;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    animation: fadeIn 0.15s ease;
+  }
+  .overlay.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: #050f1e;
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 860px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 70px rgba(0,100,255,0.14), 0 20px 60px rgba(0,0,0,0.6);
+    animation: slideUp 0.18s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .modal-eyebrow {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .modal-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+  .modal-desc { font-size: 12px; color: var(--text4); }
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text4);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 2px 0 2px 12px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+
+  /* variables */
+  .vars-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .vars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .var-field label {
+    display: block;
+    font-size: 10px;
+    color: var(--text3);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .var-field input {
+    width: 100%;
+    background: #0a1e35;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: var(--mono);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .var-field input:focus { border-color: var(--accent); }
+  .var-field input::placeholder { color: #1a3a5c; }
+
+  /* prompt text */
+  .prompt-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .prompt-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #b8d4ee;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .highlight { color: #ffcc44; font-style: italic; }
+
+  /* modal footer */
+  .modal-footer {
+    padding: 13px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .btn-copy {
+    background: #003366;
+    border: 1px solid #1a5a9c;
+    border-radius: 6px;
+    color: #7ac0ff;
+    padding: 9px 18px;
+    font-size: 12px;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-copy:hover { background: #004080; }
+  .btn-copy.copied { background: #0a3a1a; border-color: #00aa44; color: #00cc66; }
+  .btn-close-foot {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    color: var(--text4);
+    padding: 9px 18px;
+    font-size: 12px;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-close-foot:hover { color: var(--text3); border-color: var(--text4); }
+  .footer-tags {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* ── RESPONSIVE ───────────────────────────────── */
+  @media (max-width: 768px) {
+    header, .layout { padding-left: 16px; padding-right: 16px; }
+    .sidebar { display: none; }
+    .layout { gap: 0; }
+    .grid { grid-template-columns: 1fr; }
+    .modal { max-height: 96vh; }
+    .vars-grid { grid-template-columns: 1fr; }
+    .footer-tags { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ HEADER -->
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-eyebrow">ANTI-FINANCIAL CRIME · INVESTIGATIONS PLATFORM</div>
+      <h1 class="header-title">FCIP Prompt Library</h1>
+      <p class="header-sub">Product Owner &amp; BA Automation Toolkit · React · Spring Boot · PostgreSQL · Kubernetes</p>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search prompts, tags, workflows…" autocomplete="off">
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="header-count-label">TOTAL PROMPTS</div>
+      <div class="header-count" id="totalCount">16</div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════ LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section-label">CATEGORIES</div>
+    <!-- injected by JS -->
+
+    <div class="how-box">
+      <div class="how-box-label">HOW TO USE</div>
+      <div class="how-step"><span class="how-step-num">1.</span>Click any card to open</div>
+      <div class="how-step"><span class="how-step-num">2.</span>Fill in the variables</div>
+      <div class="how-step"><span class="how-step-num">3.</span>Copy the filled prompt</div>
+      <div class="how-step"><span class="how-step-num">4.</span>Paste into Claude or any LLM</div>
+    </div>
+  </nav>
+
+  <!-- MAIN GRID -->
+  <main class="grid-area">
+    <div class="grid-status" id="gridStatus"></div>
+    <div class="grid" id="grid"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">◎</div>
+      <div class="empty-title">No prompts found</div>
+      <div>Try a different search term or category</div>
+    </div>
+  </main>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div>
+        <div class="modal-eyebrow" id="modalEyebrow"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-desc" id="modalDesc"></div>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="varsSection">
+        <div class="vars-label">FILL IN VARIABLES</div>
+        <div class="vars-grid" id="varsGrid"></div>
+      </div>
+      <div class="prompt-label">PROMPT</div>
+      <div class="prompt-box" id="promptBox"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-copy" id="btnCopy">COPY PROMPT</button>
+      <button class="btn-close-foot" id="btnCloseFooter">CLOSE</button>
+      <div class="footer-tags" id="footerTags"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ DATA + LOGIC -->
+<script>
+const CATEGORIES = [
+  { id: "all",                label: "All Prompts",            icon: "◈" },
+  { id: "user-stories",       label: "User Stories",           icon: "📋" },
+  { id: "acceptance-criteria",label: "Acceptance Criteria",    icon: "✅" },
+  { id: "backlog-refinement", label: "Backlog Refinement",     icon: "🔍" },
+  { id: "sprint-artefacts",   label: "Sprint Artefacts",       icon: "🏃" },
+  { id: "stakeholder-comms",  label: "Stakeholder Comms",      icon: "📣" },
+  { id: "technical-bridge",   label: "Tech ↔ Business Bridge", icon: "🔗" },
+  { id: "investigation-design",label:"Investigation Design",   icon: "🕵️" },
+  { id: "regulatory",         label: "Regulatory Alignment",   icon: "⚖️" },
+];
+
+const PROMPTS = [
+  // ── USER STORIES ──────────────────────────────────────────────
+  {
+    id:"us-1", category:"user-stories",
+    title:"Generate User Story from Detection Event",
+    description:"Converts a raw detection signal description into an INVEST-compliant user story for the investigator workflow.",
+    tags:["FCIP","investigator","detection"],
+    variables:["DETECTION_TYPE","INVESTIGATOR_PERSONA","BUSINESS_OUTCOME"],
+    prompt:`You are a senior product owner on an Anti-Financial Crime Investigations Platform (FCIP) at a tier-1 multinational bank. The platform consumes structured DetectionEvents from upstream systems (transaction monitoring, sanctions screening, negative news) and provides investigators with a case management and workflow layer.
+
+Tech stack: React front-end, Spring Boot microservices, PostgreSQL, Kubernetes.
+
+Write a production-quality user story using the standard format:
+"As a [INVESTIGATOR_PERSONA], I want to [action], so that [BUSINESS_OUTCOME]."
+
+Detection type: [DETECTION_TYPE]
+
+Requirements:
+- Follow INVEST principles (Independent, Negotiable, Valuable, Estimable, Small, Testable)
+- Include a one-sentence "Context" block explaining the compliance driver (POCA 2002, MLRs 2017, FATF, JMLSG as appropriate)
+- Add a "Definition of Ready" checklist (5 items max)
+- Add a "Definition of Done" checklist (5 items max)
+- Flag any dependency on upstream DetectionEvent schema fields
+- Keep the story to a single sprint (≤ 5 story points assumed)
+- Output in clean markdown`
+  },
+  {
+    id:"us-2", category:"user-stories",
+    title:"Decompose Epic into Sprint-Sized Stories",
+    description:"Breaks a large AFC epic into a prioritised, dependency-ordered set of user stories ready for sprint planning.",
+    tags:["epic","decomposition","sprint planning"],
+    variables:["EPIC_TITLE","EPIC_DESCRIPTION","NUMBER_OF_SPRINTS"],
+    prompt:`You are a senior product owner on an Anti-Financial Crime Investigations Platform (FCIP).
+
+Epic title: [EPIC_TITLE]
+Epic description: [EPIC_DESCRIPTION]
+Target delivery: [NUMBER_OF_SPRINTS] sprints
+
+Decompose this epic into sprint-ready user stories. For each story:
+1. Write the story in "As a / I want / So that" format
+2. Assign a suggested story point estimate (Fibonacci: 1, 2, 3, 5, 8)
+3. Identify the primary persona (AML Investigator, MLRO, Compliance Analyst, System/API)
+4. Note any hard technical dependency (React component, Spring Boot endpoint, PostgreSQL schema change, K8s config)
+5. Flag regulatory relevance if applicable (FATF R.20, NCA SAR, FCA SYSC)
+6. Suggest a sprint sequence with a brief rationale
+
+Output as a prioritised markdown table followed by a dependency diagram in Mermaid syntax.`
+  },
+  {
+    id:"us-3", category:"user-stories",
+    title:"Persona-Driven Story from Investigation Pain Point",
+    description:"Takes a field observation or pain point and generates a user story with empathy map context.",
+    tags:["persona","pain point","discovery"],
+    variables:["PAIN_POINT","OBSERVED_WORKAROUND","INVESTIGATION_TYPE"],
+    prompt:`You are a product owner conducting discovery on an Anti-Financial Crime Investigations Platform.
+
+Observed pain point: [PAIN_POINT]
+Current workaround investigators are using: [OBSERVED_WORKAROUND]
+Investigation type: [INVESTIGATION_TYPE] (e.g., SAR, sanctions hit, PEP review, transaction pattern)
+
+Generate:
+1. A concise empathy map (Think & Feel, Hear, See, Say & Do, Pains, Gains) for the investigator persona
+2. A user story that directly addresses the pain point
+3. A hypothesis statement: "We believe that [building X] for [persona] will achieve [outcome]. We will know this is true when [measurable signal]."
+4. Two alternative story framings — one optimised for MVP speed, one for long-term platform value
+5. A risk note: what compliance or audit risk exists if this pain point is NOT resolved?
+
+Output in markdown.`
+  },
+
+  // ── ACCEPTANCE CRITERIA ───────────────────────────────────────
+  {
+    id:"ac-1", category:"acceptance-criteria",
+    title:"BDD Acceptance Criteria for Investigation Workflow",
+    description:"Generates Given/When/Then scenarios covering happy path, edge cases, and regulatory obligations.",
+    tags:["BDD","Gherkin","testing"],
+    variables:["USER_STORY","REGULATION","EDGE_CASES"],
+    prompt:`You are a senior BA on an Anti-Financial Crime Investigations Platform (React / Spring Boot / PostgreSQL / Kubernetes).
+
+User story: [USER_STORY]
+Primary regulatory obligation: [REGULATION]
+Known edge cases to cover: [EDGE_CASES]
+
+Write comprehensive BDD acceptance criteria in Gherkin syntax:
+- Minimum 1 happy-path scenario
+- Minimum 2 edge-case or error scenarios
+- Minimum 1 regulatory/audit scenario (e.g., SAR submission deadline, case lock after 7 days, audit trail write)
+- Each scenario must be implementable as a Spring Boot integration test and a React component test (Playwright or Cypress)
+- Flag any scenario that requires a schema migration or K8s config change
+- Add a "Non-Functional Acceptance Criteria" section covering: response time SLA, audit log completeness, RBAC enforcement
+
+Output in clean Gherkin markdown with annotations.`
+  },
+  {
+    id:"ac-2", category:"acceptance-criteria",
+    title:"API Contract Acceptance Criteria",
+    description:"Produces acceptance criteria for a new or modified FCIP REST endpoint, covering functional, security, and performance dimensions.",
+    tags:["API","REST","Spring Boot","contract"],
+    variables:["ENDPOINT_DESCRIPTION","CONSUMER_SYSTEM","DATA_SENSITIVITY"],
+    prompt:`You are a BA defining acceptance criteria for a new REST API endpoint on the FCIP platform (Spring Boot microservice, PostgreSQL, deployed on Kubernetes).
+
+Endpoint: [ENDPOINT_DESCRIPTION]
+Consumer: [CONSUMER_SYSTEM] (e.g., React UI, upstream TMS, downstream SAR reporting tool)
+Data sensitivity: [DATA_SENSITIVITY] (e.g., PII, SAR data, transaction records)
+
+Generate acceptance criteria covering:
+1. Functional: correct HTTP status codes, response payload schema, pagination if applicable
+2. Security: JWT/OAuth scope enforcement, field-level encryption for PII, audit log on every write
+3. Performance: P95 latency target, max payload size, rate limiting
+4. Error handling: 4xx and 5xx scenarios with meaningful error bodies
+5. Backward compatibility: versioning strategy, deprecation notice if breaking change
+6. Kubernetes: liveness/readiness probe behaviour under load
+
+Format as a numbered AC list plus a test coverage matrix (Unit / Integration / Contract / E2E) in markdown.`
+  },
+  {
+    id:"ac-3", category:"acceptance-criteria",
+    title:"SAR Narrative Quality Acceptance Criteria",
+    description:"Defines measurable AC for AI-generated or human-authored SAR narratives to meet NCA submission standards.",
+    tags:["SAR","NCA","narrative","quality"],
+    variables:["SAR_TYPE","TYPOLOGY"],
+    prompt:`You are a product owner defining quality acceptance criteria for SAR narrative generation on an FCIP platform.
+
+SAR type: [SAR_TYPE] (e.g., Consent SAR, Defence Against Money Laundering SAR, Moratorium SAR)
+Typology: [TYPOLOGY] (e.g., layering via FX, trade-based ML, crypto-to-fiat conversion)
+
+Define acceptance criteria that ensure a SAR narrative meets NCA SARs Online submission standards:
+1. Mandatory fields present and correctly formatted (subject details, suspicion grounds, reporter details)
+2. Narrative completeness: covers Who, What, When, Where, Why (5W framework)
+3. Typology-specific indicators referenced (map to FATF/JMLSG guidance)
+4. No speculative language (test: zero occurrences of "possibly", "might", "perhaps")
+5. Tense consistency and factual accuracy (test: all dates verifiable against case evidence)
+6. Readability score target (Flesch-Kincaid Grade ≤ 12)
+7. Audit trail: every AI-assisted narrative must log model version, prompt hash, human reviewer ID, and approval timestamp in PostgreSQL
+
+Output as numbered acceptance criteria plus a SAR quality rubric (1–5 scale per dimension) in markdown.`
+  },
+
+  // ── BACKLOG REFINEMENT ────────────────────────────────────────
+  {
+    id:"br-1", category:"backlog-refinement",
+    title:"Backlog Item Health Check",
+    description:"Evaluates a draft backlog item against INVEST, SMART, and FCIP platform standards and returns a structured improvement report.",
+    tags:["refinement","quality","INVEST"],
+    variables:["BACKLOG_ITEM_TEXT"],
+    prompt:`You are a senior product owner reviewing backlog items for an Anti-Financial Crime Investigations Platform.
+
+Backlog item to review:
+---
+[BACKLOG_ITEM_TEXT]
+---
+
+Evaluate this item against the following dimensions and score each 1–5:
+1. INVEST compliance (Independent, Negotiable, Valuable, Estimable, Small, Testable)
+2. Clarity of business value for financial crime investigations
+3. Testability (can QA write automated tests without further clarification?)
+4. Technical feasibility signal (does it imply unrealistic React/Spring Boot/PostgreSQL/K8s work?)
+5. Regulatory traceability (is there a clear link to FATF, FCA, JMLSG, POCA, or NCA requirements?)
+6. Persona clarity (is it obvious WHO benefits?)
+
+For each dimension scoring < 4, provide:
+- A specific improvement suggestion
+- A rewritten version of the relevant section
+
+Output a structured markdown report with scores, findings, and a rewritten "Recommended" version of the item.`
+  },
+  {
+    id:"br-2", category:"backlog-refinement",
+    title:"Dependency & Risk Pre-Mortem",
+    description:"Runs a pre-mortem on a set of backlog items to surface hidden dependencies, cross-team risks, and regulatory blockers before sprint planning.",
+    tags:["risk","dependencies","pre-mortem"],
+    variables:["SPRINT_BACKLOG_ITEMS","TEAM_CONTEXT"],
+    prompt:`You are a product owner running a pre-mortem on an upcoming sprint for an FCIP platform team.
+
+Sprint backlog items:
+---
+[SPRINT_BACKLOG_ITEMS]
+---
+
+Team context: [TEAM_CONTEXT] (e.g., 6 engineers, 1 QA, no dedicated DBA, shared K8s namespace with 2 other teams)
+
+Imagine the sprint has failed. Identify and categorise every reason it could have failed:
+
+1. Technical Dependencies — React component library gaps, Spring Boot service boundaries, PostgreSQL schema locks, K8s resource contention
+2. Data Dependencies — DetectionEvent schema assumptions, upstream system SLA, test data availability
+3. Regulatory/Compliance Blockers — items requiring MLRO sign-off, DPO review, legal hold considerations
+4. Team Capacity Risks — skill gaps, context-switching, review bottlenecks
+5. Integration Risks — downstream consumers of new endpoints, SAR reporting pipeline impacts
+
+For each identified risk:
+- Assign severity: High / Medium / Low
+- Suggest a mitigation action
+- Flag if it should block sprint start
+
+Output as a prioritised risk register in markdown table format plus an executive summary (3 sentences max).`
+  },
+  {
+    id:"br-3", category:"backlog-refinement",
+    title:"Three Amigos Preparation Brief",
+    description:"Generates a structured Three Amigos session brief with targeted questions for PO, Dev, and QA perspectives.",
+    tags:["three amigos","refinement","collaboration"],
+    variables:["STORY_TITLE","STORY_TEXT","COMPLEXITY_DRIVER"],
+    prompt:`You are a senior BA preparing a Three Amigos session for an FCIP platform story.
+
+Story title: [STORY_TITLE]
+Story text: [STORY_TEXT]
+Primary complexity driver: [COMPLEXITY_DRIVER] (e.g., real-time alert processing, SAR co-authoring, multi-jurisdiction case routing)
+
+Generate a structured Three Amigos prep brief:
+
+Product Owner questions to answer before the session:
+- 5 business/compliance questions the PO must resolve
+
+Developer questions to raise in the session:
+- 5 technical questions covering React, Spring Boot, PostgreSQL schema, K8s deployment, and API design
+
+QA questions to raise in the session:
+- 5 testability questions covering automation strategy, test data, regulatory edge cases, and performance
+
+Pre-read material to circulate:
+- Relevant JMLSG/FATF guidance sections
+- Existing FCIP API contracts or schemas that this story touches
+- Any prior BA investigation notes
+
+Session output template:
+- Agreed scope (In / Out of scope table)
+- Agreed acceptance criteria skeleton (3 bullet points)
+- Identified spike actions with owner and deadline
+
+Output in clean markdown.`
+  },
+
+  // ── SPRINT ARTEFACTS ──────────────────────────────────────────
+  {
+    id:"sa-1", category:"sprint-artefacts",
+    title:"Sprint Goal Statement",
+    description:"Generates a crisp, outcome-focused sprint goal from a set of sprint backlog items.",
+    tags:["sprint goal","planning","OKR"],
+    variables:["SPRINT_BACKLOG_SUMMARY","QUARTER_OKR"],
+    prompt:`You are a product owner crafting a sprint goal for an FCIP platform team at a tier-1 bank.
+
+Sprint backlog summary: [SPRINT_BACKLOG_SUMMARY]
+Relevant quarterly OKR: [QUARTER_OKR]
+
+Write a sprint goal that:
+1. Is a single sentence (≤ 25 words) describing the outcome, not the output
+2. Is meaningful to both engineers and compliance stakeholders
+3. Is testable — the team can objectively agree at sprint end whether it was achieved
+4. Connects to the OKR
+5. Does not list specific stories or tickets
+
+Then write:
+- A 3-sentence sprint narrative for the sprint review invite (audience: MLRO, Head of Financial Crime Technology, Engineering Lead)
+- A one-line Confluence page title for the sprint report
+- A risk flag: what single thing could prevent the goal from being met?
+
+Output in markdown.`
+  },
+  {
+    id:"sa-2", category:"sprint-artefacts",
+    title:"Sprint Review Slide Content",
+    description:"Produces structured content for a sprint review presentation covering delivery, demo notes, metrics, and next sprint preview.",
+    tags:["sprint review","slides","stakeholder"],
+    variables:["COMPLETED_STORIES","METRICS","NEXT_SPRINT_THEME"],
+    prompt:`You are a product owner preparing the content for a sprint review presentation for an FCIP platform at a tier-1 bank. The audience includes the MLRO, Financial Crime Technology leadership, and engineering leads.
+
+Completed stories this sprint: [COMPLETED_STORIES]
+Key metrics achieved: [METRICS] (e.g., P95 API latency, investigation throughput, test coverage %)
+Next sprint theme: [NEXT_SPRINT_THEME]
+
+Generate slide content for:
+
+Slide 1 – Sprint Goal & Outcome (3 bullet points: goal, achieved/not achieved, one sentence why)
+
+Slide 2 – What We Shipped (table: Story | Business Value | Demo Note | Regulatory Relevance)
+
+Slide 3 – Quality & Technical Health (metrics table: Coverage %, P95 Latency, Defect Rate, K8s Uptime, Open Security Issues)
+
+Slide 4 – What We Learned (2 things that went well, 1 thing to improve, 1 risk to carry forward)
+
+Slide 5 – Next Sprint Preview (theme, top 3 stories by business value, one dependency to resolve before sprint start)
+
+Slide 6 – Questions & Decisions Needed (up to 3 decisions or approvals needed from stakeholders)
+
+Output in clean markdown with slide headers.`
+  },
+  {
+    id:"sa-3", category:"sprint-artefacts",
+    title:"Definition of Done (AFC-Specific)",
+    description:"Generates a team-specific DoD that embeds regulatory, security, and audit obligations alongside engineering practices.",
+    tags:["DoD","quality","compliance engineering"],
+    variables:["TEAM_NAME","STORY_TYPE"],
+    prompt:`You are a product owner defining a team-specific Definition of Done for [TEAM_NAME] working on the FCIP platform (React, Spring Boot, PostgreSQL, Kubernetes).
+
+Story type: [STORY_TYPE] (e.g., new API endpoint, React UI feature, database schema migration, K8s configuration change, SAR workflow change)
+
+Generate a Definition of Done checklist covering:
+
+Code Quality
+- Unit test coverage threshold
+- Integration test requirement
+- Code review approvals required
+
+Security & Compliance (non-negotiable for AFC platform)
+- OWASP Top 10 check performed
+- PII fields encrypted at rest and in transit confirmed
+- RBAC enforcement verified for new endpoints
+- Audit log entries verified in PostgreSQL (who, what, when, outcome)
+- No hardcoded credentials or secrets in codebase
+
+Regulatory Traceability
+- Story linked to regulatory requirement in Jira (FATF, FCA, POCA, NCA)
+- Compliance sign-off obtained if story touches SAR submission, case closure, or data retention
+
+Deployment Readiness
+- Docker image built and scanned
+- K8s manifests reviewed and resource limits set
+- Feature flag configured if partial release
+- Runbook updated in Confluence
+
+Documentation
+- API contract updated (OpenAPI spec)
+- Confluence page created or updated
+- Changelog entry added
+
+Output as a tiered checklist in markdown. Mark items as [MANDATORY] or [CONDITIONAL] based on story type.`
+  },
+
+  // ── STAKEHOLDER COMMS ─────────────────────────────────────────
+  {
+    id:"sc-1", category:"stakeholder-comms",
+    title:"MLRO / Senior Stakeholder Update",
+    description:"Drafts a concise, compliance-aware progress update for the MLRO or Head of Financial Crime Technology.",
+    tags:["MLRO","exec update","comms"],
+    variables:["PERIOD","KEY_DELIVERIES","RISKS","DECISIONS_NEEDED"],
+    prompt:`You are a product owner drafting a senior stakeholder update for the MLRO and Head of Financial Crime Technology at a tier-1 bank.
+
+Period: [PERIOD]
+Key deliveries: [KEY_DELIVERIES]
+Current risks: [RISKS]
+Decisions needed from stakeholders: [DECISIONS_NEEDED]
+
+Write a structured update suitable for email or a brief Confluence page:
+
+Executive Summary (3 sentences: what we delivered, what we're focused on, what we need)
+
+Delivery Status (RAG status table: workstream | status | key milestone | next milestone | owner)
+
+Regulatory & Compliance Posture (2–3 sentences: any items with regulatory deadlines, audit findings, or compliance blockers)
+
+Risks & Issues (table: Risk | Severity | Mitigation | Owner | Deadline)
+
+Decisions Required (numbered list: each item states the decision, the options, the recommendation, and the deadline)
+
+Next Period Preview (3 bullet points: what investigators and the compliance function will see delivered)
+
+Tone: confident, precise, no jargon beyond standard AFC terminology. No passive voice. Maximum 400 words total.`
+  },
+  {
+    id:"sc-2", category:"stakeholder-comms",
+    title:"Change Communication to Investigators",
+    description:"Produces a clear, non-technical change notice for frontline AML investigators when a platform feature changes.",
+    tags:["change comms","investigator","UX"],
+    variables:["FEATURE_CHANGED","WHAT_CHANGED","WHY_IT_CHANGED","EFFECTIVE_DATE"],
+    prompt:`You are a product owner communicating a platform change to frontline AML investigators who use the FCIP platform daily.
+
+Feature changed: [FEATURE_CHANGED]
+What changed: [WHAT_CHANGED]
+Why it changed: [WHY_IT_CHANGED] (e.g., regulatory requirement, investigator feedback, performance issue)
+Effective date: [EFFECTIVE_DATE]
+
+Write a change communication that:
+1. Opens with the single most important thing the investigator needs to know (≤ 2 sentences)
+2. Explains what is different and what stays the same (use a Before / After comparison)
+3. States any action the investigator must take before or after the change
+4. Explains the benefit to their investigation workflow in plain language (no technical terms)
+5. Provides a point of contact for questions
+6. Includes a one-paragraph FAQ covering the 3 most likely questions
+
+Tone: direct, respectful of the investigator's expertise, no condescension. Max 300 words.
+Output in markdown.`
+  },
+  {
+    id:"sc-3", category:"stakeholder-comms",
+    title:"Regulatory Audit Response Draft",
+    description:"Drafts a structured response to an internal or external audit finding related to the FCIP platform.",
+    tags:["audit","regulatory","FCA","response"],
+    variables:["AUDIT_FINDING","FINDING_SEVERITY","ROOT_CAUSE","REMEDIATION_ACTIONS"],
+    prompt:`You are a product owner drafting a formal audit finding response for the FCIP platform at a tier-1 bank. This will be reviewed by the MLRO, Legal, and potentially submitted to the FCA or PRA.
+
+Audit finding: [AUDIT_FINDING]
+Finding severity: [FINDING_SEVERITY] (Critical / High / Medium / Low)
+Root cause (as understood): [ROOT_CAUSE]
+Planned remediation actions: [REMEDIATION_ACTIONS]
+
+Draft a formal audit response covering:
+
+Finding Acknowledgement (1–2 sentences accepting or partially contesting the finding with rationale)
+
+Root Cause Analysis (concise 5-Why or Ishikawa-style analysis)
+
+Remediation Plan (table: Action | Owner | Target Date | Success Metric | Regulatory Reference)
+
+Interim Controls (what is in place NOW to reduce risk while full remediation is completed)
+
+Evidence of Completion (what artefacts will demonstrate each action is done: Jira ticket, Confluence page, test report, K8s deployment log, PostgreSQL audit trail query)
+
+Escalation if Not Remediated (what escalation path applies if target dates are missed)
+
+Tone: formal, factual, precise. No speculation. No admission of wider systemic failure beyond what the finding covers.
+Output in clean structured markdown.`
+  },
+
+  // ── TECHNICAL BRIDGE ──────────────────────────────────────────
+  {
+    id:"tb-1", category:"technical-bridge",
+    title:"Translate Business Requirement to Technical Spec",
+    description:"Converts a compliance or business requirement into a technical specification engineers can act on immediately.",
+    tags:["spec","technical","translation"],
+    variables:["BUSINESS_REQUIREMENT","AFFECTED_SERVICES"],
+    prompt:`You are a BA bridging business and engineering on an FCIP platform (React, Spring Boot, PostgreSQL, Kubernetes).
+
+Business requirement: [BUSINESS_REQUIREMENT]
+Affected services/components: [AFFECTED_SERVICES]
+
+Produce a technical specification containing:
+
+1. Context & Regulatory Driver
+One paragraph explaining the business need and its regulatory basis.
+
+2. Proposed Solution Summary
+2–3 sentences describing the high-level approach.
+
+3. API Design (if applicable)
+- Endpoint: METHOD /path
+- Request schema (JSON)
+- Response schema (JSON)
+- Error cases and HTTP status codes
+- Auth/RBAC requirement
+
+4. Data Model Changes (if applicable)
+- PostgreSQL table/column additions or changes (use SQL DDL notation)
+- Migration strategy (zero-downtime if production)
+- Index requirements
+
+5. React UI Changes (if applicable)
+- Component(s) affected
+- State changes
+- User interaction flow (numbered steps)
+
+6. Kubernetes / Deployment Considerations
+- ConfigMap or Secret changes
+- Resource limit implications
+- Feature flag requirement
+
+7. Non-Functional Requirements
+- Performance targets
+- Security controls
+- Audit log requirements
+
+8. Open Questions for Engineering
+Numbered list of decisions the team must make.
+
+Output in clean markdown.`
+  },
+  {
+    id:"tb-2", category:"technical-bridge",
+    title:"DetectionEvent Schema Change Impact Assessment",
+    description:"Assesses FCIP downstream impact when an upstream system proposes a change to the DetectionEvent contract.",
+    tags:["DetectionEvent","schema","contract","impact"],
+    variables:["PROPOSED_CHANGE","CURRENT_SCHEMA_FIELDS","UPSTREAM_SYSTEM"],
+    prompt:`You are a product owner assessing the impact of an upstream schema change on the FCIP platform. The FCIP consumes DetectionEvents as its primary input contract and does not perform detection itself.
+
+Upstream system proposing change: [UPSTREAM_SYSTEM]
+Proposed change to DetectionEvent schema: [PROPOSED_CHANGE]
+Current relevant schema fields: [CURRENT_SCHEMA_FIELDS]
+
+Produce an impact assessment covering:
+
+1. Change Summary (1 sentence neutral description of the change)
+
+2. Breaking vs Non-Breaking Classification
+- Is this additive, modificatory, or removal?
+- Backward compatibility verdict with rationale
+
+3. FCIP Component Impact Matrix
+Table: Component (React UI / Spring Boot service / PostgreSQL schema / K8s config) | Impact | Severity | Estimated effort | Action required
+
+4. Investigator Workflow Impact
+Which investigation screens, case views, or SAR workflows are affected? What does an investigator see differently?
+
+5. Regulatory Data Integrity Risk
+Does this change risk loss of audit trail completeness, SAR accuracy, or data retention compliance?
+
+6. Recommended Response Options
+Option A: Accept change and adapt (effort, risk, timeline)
+Option B: Reject and request upstream amendment (justification, negotiation points)
+Option C: Absorb via mapping layer (technical approach, trade-offs)
+
+7. Decision Required
+State the decision, the deadline, and the stakeholder who must own it.
+
+Output in structured markdown.`
+  },
+
+  // ── INVESTIGATION DESIGN ──────────────────────────────────────
+  {
+    id:"id-1", category:"investigation-design",
+    title:"Investigation Workflow Design Brief",
+    description:"Generates a structured design brief for a new or revised investigation workflow from alert triage to SAR submission.",
+    tags:["workflow","UX","investigation","SAR"],
+    variables:["TYPOLOGY","INVESTIGATOR_TYPE","JURISDICTIONS"],
+    prompt:`You are a product owner designing an investigation workflow on the FCIP platform for a specific financial crime typology.
+
+Typology: [TYPOLOGY] (e.g., trade-based money laundering, crypto layering, PEP transaction monitoring, sanctions evasion)
+Primary investigator type: [INVESTIGATOR_TYPE] (e.g., L1 Transaction Reviewer, L2 AML Investigator, MLRO)
+Jurisdictions in scope: [JURISDICTIONS]
+
+Produce a workflow design brief covering:
+
+1. Workflow Overview
+High-level Mermaid flowchart: DetectionEvent ingestion → triage → investigation stages → decision (SAR / No SAR / Escalate / Monitor) → closure
+
+2. Stage-by-Stage Design
+For each stage: name, investigator action, system action, decision criteria, SLA, data displayed, data written
+
+3. Key Investigation Screens
+For each screen: name, primary user, data inputs, data outputs, critical UI components (React), API calls (Spring Boot endpoints)
+
+4. Risk Scoring Integration
+How does the platform surface composite risk scores to the investigator? What factors are weighted for this typology?
+
+5. Evidence & Document Management
+What supporting documents can be attached? Where are they stored? How are they linked to the SAR?
+
+6. Regulatory Obligations Built Into Workflow
+- Mandatory disclosure deadlines (e.g., 7-day DAML consent window)
+- Audit log checkpoints
+- MLRO escalation trigger criteria
+- Data retention tagging
+
+7. Open Design Questions
+Top 5 questions for the UX designer and engineering lead.
+
+Output in structured markdown with Mermaid diagram.`
+  },
+  {
+    id:"id-2", category:"investigation-design",
+    title:"Case Management Data Model Design",
+    description:"Produces a PostgreSQL-aligned data model design for a new case type or investigation scenario.",
+    tags:["data model","PostgreSQL","case management"],
+    variables:["CASE_TYPE","KEY_ENTITIES","RETENTION_PERIOD"],
+    prompt:`You are a BA designing the data model for a new case type on the FCIP platform (PostgreSQL, Spring Boot JPA).
+
+Case type: [CASE_TYPE] (e.g., SAR investigation, sanctions alert, PEP enhanced due diligence, fraud referral)
+Key entities involved: [KEY_ENTITIES] (e.g., Subject, Account, Transaction, Alert, Evidence, Decision, Reviewer)
+Regulatory retention period: [RETENTION_PERIOD] (e.g., 5 years post-SAR submission, 7 years per MLRs 2017)
+
+Design the data model covering:
+
+1. Entity-Relationship Summary
+Mermaid ER diagram showing entities, relationships, and cardinality.
+
+2. Core Table Definitions
+For each key table: table name, columns (name, type, nullable, constraints), primary key, foreign keys, indexes.
+
+3. Audit Trail Design
+How is every write operation captured? (Recommend: separate audit_log table or event sourcing approach with rationale)
+
+4. Soft Delete & Data Retention Strategy
+How are records marked for retention vs deletion? How is the 5/7-year rule enforced? Recommended: deleted_at column + scheduled K8s CronJob for purge.
+
+5. Multi-Tenancy / Multi-Jurisdiction Considerations
+If the platform operates across jurisdictions: schema-per-tenant vs row-level tenant_id approach, with trade-offs.
+
+6. Performance Considerations
+Indexes to add for common query patterns (case search, alert dashboard, SAR report).
+
+7. Spring Boot JPA Notes
+Entity class naming conventions, cascade strategy, any N+1 query risks to flag.
+
+Output in structured markdown with Mermaid ER diagram and SQL DDL snippets.`
+  },
+
+  // ── REGULATORY ALIGNMENT ──────────────────────────────────────
+  {
+    id:"ra-1", category:"regulatory",
+    title:"Regulatory Requirement Traceability Matrix",
+    description:"Builds a traceability matrix mapping FCIP platform features to specific regulatory obligations across jurisdictions.",
+    tags:["traceability","FATF","FCA","JMLSG","NCA"],
+    variables:["FEATURE_LIST","JURISDICTIONS","REGULATORY_FRAMEWORKS"],
+    prompt:`You are a product owner building a regulatory traceability matrix for the FCIP platform at a tier-1 multinational bank.
+
+Platform features: [FEATURE_LIST]
+Jurisdictions: [JURISDICTIONS]
+Regulatory frameworks in scope: [REGULATORY_FRAMEWORKS] (e.g., FATF 40 Recommendations, UK MLRs 2017, POCA 2002, FCA SYSC, JMLSG, NCA SAR, EU 6AMLD, FinCEN)
+
+For each feature, produce a traceability matrix row containing:
+- Feature name
+- Regulatory obligation reference (specific article/section)
+- Obligation type (Mandatory / Best Practice / Guidance)
+- Jurisdiction
+- Evidence of compliance in the platform (which screen, API, log entry, or report satisfies it)
+- Compliance status (Implemented / Partial / Planned / Gap)
+- Gap remediation action (if applicable)
+
+Output as:
+1. A full markdown table (all features × all regulations)
+2. A gap summary section listing only "Partial" and "Gap" items with recommended remediation stories
+3. An audit-ready narrative paragraph (2–3 sentences) suitable for regulatory submission or internal audit pack
+
+Note any areas where the FCIP "bring your own detection" model creates shared responsibility with upstream systems and where the accountability boundary lies.`
+  },
+  {
+    id:"ra-2", category:"regulatory",
+    title:"New Regulation Impact Assessment",
+    description:"Assesses the impact of a new or updated regulation on the FCIP platform and generates a prioritised change backlog.",
+    tags:["regulation","impact","change backlog"],
+    variables:["REGULATION_NAME","KEY_REQUIREMENTS","EFFECTIVE_DATE"],
+    prompt:`You are a product owner assessing the impact of a new or updated regulation on the FCIP platform (React, Spring Boot, PostgreSQL, Kubernetes).
+
+Regulation: [REGULATION_NAME]
+Key requirements (as understood): [KEY_REQUIREMENTS]
+Effective date: [EFFECTIVE_DATE]
+
+Produce a regulatory impact assessment:
+
+1. Executive Summary (3 sentences: what the regulation requires, what the FCIP platform must change, what the risk is if not compliant)
+
+2. Scope Assessment
+Which FCIP modules are in scope? (Case Management, Alert Triage, SAR Submission, Audit Trail, Reporting, API Layer, Data Retention)
+
+3. Gap Analysis
+Table: Requirement | Current Platform State | Gap | Severity (High/Med/Low) | Effort Estimate
+
+4. Prioritised Change Backlog
+Ordered list of user stories or technical tasks needed, with:
+- Story title
+- Regulatory article driving it
+- Effort estimate (S/M/L)
+- Suggested sprint for delivery relative to effective date
+
+5. Implementation Timeline
+Mermaid Gantt chart showing key milestones from now to effective date.
+
+6. Stakeholder Actions Required
+Who in the bank (MLRO, DPO, Legal, Engineering, Compliance) needs to act, by when, and what specifically they must do.
+
+7. Residual Risk if Partial Implementation
+If only high-priority items are delivered by effective date, what residual risk remains and how should it be managed?
+
+Output in structured markdown with Mermaid Gantt.`
+  }
+];
+
+// ─── STATE ───────────────────────────────────────────────────
+let activeCategory = "all";
+let activePrompt   = null;
+let searchQuery    = "";
+
+// ─── HELPERS ─────────────────────────────────────────────────
+function getCategoryMeta(id) {
+  return CATEGORIES.find(c => c.id === id) || {};
+}
+
+function getFiltered() {
+  const q = searchQuery.toLowerCase();
+  return PROMPTS.filter(p => {
+    const matchCat  = activeCategory === "all" || p.category === activeCategory;
+    const matchText = !q ||
+      p.title.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q) ||
+      p.tags.some(t => t.toLowerCase().includes(q));
+    return matchCat && matchText;
+  });
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────
+function renderSidebar() {
+  const sb = document.getElementById("sidebar");
+  // remove old buttons
+  sb.querySelectorAll(".cat-btn").forEach(el => el.remove());
+  const insertBefore = sb.querySelector(".how-box");
+
+  CATEGORIES.forEach(cat => {
+    const count = cat.id === "all"
+      ? PROMPTS.length
+      : PROMPTS.filter(p => p.category === cat.id).length;
+
+    const btn = document.createElement("button");
+    btn.className = "cat-btn" + (cat.id === activeCategory ? " active" : "");
+    btn.dataset.catId = cat.id;
+    btn.innerHTML = `<span>${cat.icon} ${cat.label}</span><span class="cat-count">${count}</span>`;
+    btn.addEventListener("click", () => {
+      activeCategory = cat.id;
+      renderSidebar();
+      renderGrid();
+    });
+    sb.insertBefore(btn, insertBefore);
+  });
+}
+
+// ─── GRID ─────────────────────────────────────────────────────
+function renderGrid() {
+  const grid    = document.getElementById("grid");
+  const empty   = document.getElementById("emptyState");
+  const status  = document.getElementById("gridStatus");
+  const filtered = getFiltered();
+
+  const catLabel = activeCategory === "all"
+    ? ""
+    : ` in ${getCategoryMeta(activeCategory).label}`;
+  const searchLabel = searchQuery ? ` matching "${searchQuery}"` : "";
+  status.textContent = `${filtered.length} prompt${filtered.length !== 1 ? "s" : ""}${searchLabel}${catLabel}`;
+
+  grid.innerHTML = "";
+
+  if (filtered.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  filtered.forEach(p => {
+    const cat = getCategoryMeta(p.category);
+    const card = document.createElement("div");
+    card.className = "card";
+    card.setAttribute("tabindex","0");
+    card.setAttribute("role","button");
+    card.setAttribute("aria-label", p.title);
+
+    const pillsHTML = [
+      p.variables.length > 0
+        ? `<span class="pill pill-var">${p.variables.length} VAR${p.variables.length !== 1 ? "S" : ""}</span>`
+        : "",
+      ...p.tags.slice(0,2).map(t => `<span class="pill">${t}</span>`)
+    ].join("");
+
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="card-cat-badge">${cat.icon} ${cat.label}</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div class="card-title">${p.title}</div>
+      <div class="card-desc">${p.description}</div>
+      <div class="card-footer">${pillsHTML}</div>`;
+
+    const open = () => openModal(p);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") open(); });
+    grid.appendChild(card);
+  });
+}
+
+// ─── MODAL ───────────────────────────────────────────────────
+function buildFilledPrompt(p, vals) {
+  let result = p.prompt;
+  p.variables.forEach(v => {
+    const filled = vals[v] || "";
+    result = result.split(`[${v}]`).join(filled || `[${v}]`);
+  });
+  return result;
+}
+
+function renderPromptBox(p, vals) {
+  const box = document.getElementById("promptBox");
+  let html = p.prompt;
+  // highlight unfilled vars
+  p.variables.forEach(v => {
+    const filled = vals[v] || "";
+    if (filled) {
+      html = html.split(`[${v}]`).join(`<span class="highlight">${escHTML(filled)}</span>`);
+    }
+  });
+  box.innerHTML = escHTML(p.prompt)
+    .split(/\[([A-Z_]+)\]/)
+    .map((part, i) => {
+      if (i % 2 === 1) {
+        const v = part;
+        const val = vals[v] || "";
+        return val
+          ? `<span class="highlight">${escHTML(val)}</span>`
+          : `<span style="color:#ff8833;font-style:italic">[${v}]</span>`;
+      }
+      return part;
+    })
+    .join("");
+}
+
+function escHTML(str) {
+  return str
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+function openModal(p) {
+  activePrompt = p;
+  const cat = getCategoryMeta(p.category);
+  const vals = {};
+  p.variables.forEach(v => vals[v] = "");
+
+  document.getElementById("modalEyebrow").textContent = `${cat.icon}  ${cat.label.toUpperCase()}`;
+  document.getElementById("modalTitle").textContent   = p.title;
+  document.getElementById("modalDesc").textContent    = p.description;
+
+  // variables
+  const varsSection = document.getElementById("varsSection");
+  const varsGrid    = document.getElementById("varsGrid");
+  varsGrid.innerHTML = "";
+
+  if (p.variables.length === 0) {
+    varsSection.style.display = "none";
+  } else {
+    varsSection.style.display = "block";
+    p.variables.forEach(v => {
+      const wrap = document.createElement("div");
+      wrap.className = "var-field";
+      wrap.innerHTML = `<label>${v.replace(/_/g," ")}</label>
+        <input type="text" placeholder="Enter ${v.toLowerCase().replace(/_/g," ")}" autocomplete="off">`;
+      const input = wrap.querySelector("input");
+      input.addEventListener("input", () => {
+        vals[v] = input.value;
+        renderPromptBox(p, vals);
+      });
+      varsGrid.appendChild(wrap);
+    });
+  }
+
+  renderPromptBox(p, vals);
+
+  // footer tags
+  const ft = document.getElementById("footerTags");
+  ft.innerHTML = p.tags.map(t => `<span class="pill">${t}</span>`).join("");
+
+  // copy button state
+  const btnCopy = document.getElementById("btnCopy");
+  btnCopy.textContent = "COPY PROMPT";
+  btnCopy.classList.remove("copied");
+
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  document.getElementById("modalClose").focus();
+}
+
+function closeModal() {
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow = "";
+  activePrompt = null;
+}
+
+// copy handler
+document.getElementById("btnCopy").addEventListener("click", () => {
+  if (!activePrompt) return;
+  const vals = {};
+  document.querySelectorAll("#varsGrid .var-field").forEach((wrap, i) => {
+    const v = activePrompt.variables[i];
+    vals[v] = wrap.querySelector("input").value;
+  });
+  const text = buildFilledPrompt(activePrompt, vals);
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("btnCopy");
+    btn.textContent = "✓ COPIED";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "COPY PROMPT"; btn.classList.remove("copied"); }, 2200);
+  }).catch(() => {
+    // fallback for file:// in some browsers
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    const btn = document.getElementById("btnCopy");
+    btn.textContent = "✓ COPIED";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "COPY PROMPT"; btn.classList.remove("copied"); }, 2200);
+  });
+});
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("btnCloseFooter").addEventListener("click", closeModal);
+document.getElementById("overlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("overlay")) closeModal();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeModal();
+});
+
+// search
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchQuery = e.target.value.trim();
+  renderGrid();
+});
+
+// ─── INIT ─────────────────────────────────────────────────────
+document.getElementById("totalCount").textContent = PROMPTS.length;
+renderSidebar();
+renderGrid();
+</script>
+</body>
+</html>
