@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCIP Prompt Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --ink: #0d0f14;
+    --paper: #f4f1eb;
+    --accent: #c8421a;
+    --accent2: #1a5c8a;
+    --muted: #8a8478;
+    --rule: #d4cfC4;
+    --card: #ffffff;
+    --tag-bg: #e8e4db;
+    --tier1: #2d6a4f;
+    --tier2: #1a5c8a;
+    --tier3: #7b5e2a;
+    --tier4: #6b2d6b;
+    --copy-success: #2d6a4f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 2.5rem 3rem 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 60px solid rgba(200,66,26,0.15);
+    pointer-events: none;
+  }
+
+  .header-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  header h1 span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .header-sub {
+    font-size: 0.9rem;
+    color: #a8a298;
+    margin-top: 0.75rem;
+    font-weight: 300;
+    max-width: 520px;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: #a8a298;
+    line-height: 1.8;
+  }
+
+  .header-meta strong {
+    color: var(--paper);
+    display: block;
+    font-size: 1.1rem;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+  }
+
+  /* ── TIER LEGEND ── */
+  .tier-legend {
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    background: #f9f7f2;
+  }
+
+  .tier-legend-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 0.5rem;
+  }
+
+  .tier-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: default;
+  }
+
+  .tier-pill.t1 { background: rgba(45,106,79,0.12); color: var(--tier1); }
+  .tier-pill.t2 { background: rgba(26,92,138,0.12); color: var(--tier2); }
+  .tier-pill.t3 { background: rgba(123,94,42,0.12); color: var(--tier3); }
+  .tier-pill.t4 { background: rgba(107,45,107,0.12); color: var(--tier4); }
+
+  .tier-pill::before { content: '●'; font-size: 0.5rem; }
+
+  /* ── CONTROLS ── */
+  .controls {
+    padding: 1.5rem 3rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--paper);
+    backdrop-filter: blur(4px);
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 380px;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.6rem 0.9rem 0.6rem 2.4rem;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    background: var(--card);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--accent2); }
+
+  .filter-btn {
+    padding: 0.55rem 1.1rem;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    background: var(--card);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .result-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 200px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    border-right: 1px solid var(--rule);
+    padding: 2rem 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 0 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-section:last-child { border-bottom: none; }
+
+  .sidebar-heading {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.82rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    font-weight: 400;
+  }
+
+  .sidebar-link:hover { background: var(--tag-bg); }
+  .sidebar-link.active { background: var(--ink); color: var(--paper); font-weight: 500; }
+
+  .sidebar-link .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── PROMPT GRID ── */
+  .prompt-area {
+    padding: 2.5rem 3rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .section-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  /* ── PROMPT CARD ── */
+  .prompt-card {
+    background: var(--card);
+    border: 1.5px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prompt-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--tier-color, var(--rule));
+    border-radius: 10px 10px 0 0;
+  }
+
+  .prompt-card:hover {
+    border-color: #b8b3a8;
+    box-shadow: 0 4px 20px rgba(13,15,20,0.06);
+    transform: translateY(-1px);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .card-tier {
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: #555;
+    line-height: 1.55;
+  }
+
+  .card-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    padding: 0.2rem 0.55rem;
+    background: var(--tag-bg);
+    border-radius: 4px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .prompt-text {
+    background: #f8f6f1;
+    border: 1px solid var(--rule);
+    border-radius: 7px;
+    padding: 1rem 1.1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    line-height: 1.65;
+    color: #3a3730;
+    max-height: 160px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease;
+    white-space: pre-wrap;
+  }
+
+  .prompt-text.expanded {
+    max-height: 9000px;
+  }
+
+  .prompt-text::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40px;
+    background: linear-gradient(transparent, #f8f6f1);
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .prompt-text.expanded::after { opacity: 0; }
+
+  .card-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .btn-copy {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .btn-copy:hover { background: var(--accent); }
+  .btn-copy.copied { background: var(--copy-success); }
+
+  .btn-expand {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.85rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-expand:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── CONTEXT REFERENCE CARD ── */
+  .context-card {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .context-card::after {
+    content: 'REF';
+    position: absolute;
+    right: 2rem; top: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .context-card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    color: #e8c8a0;
+  }
+
+  .context-card p {
+    font-size: 0.83rem;
+    color: #a8a298;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .context-block {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px;
+    padding: 1rem 1.1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.69rem;
+    line-height: 1.65;
+    color: #c8c0b8;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  /* ── ROADMAP SECTION ── */
+  .roadmap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin-bottom: 3rem;
+  }
+
+  .roadmap-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .roadmap-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  .roadmap-table tr:hover td { background: #f9f7f2; }
+
+  .roadmap-table .item-name {
+    font-weight: 500;
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+  }
+
+  .roadmap-table .item-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  /* ── HIDDEN ── */
+  .prompt-card.hidden { display: none; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--paper); }
+  ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    header { padding: 2rem 1.5rem; grid-template-columns: 1fr; }
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .controls { padding: 1rem 1.5rem; }
+    .prompt-area { padding: 1.5rem; }
+    .prompt-grid { grid-template-columns: 1fr; }
+    .context-card { grid-template-columns: 1fr; }
+    .tier-legend { padding: 1rem 1.5rem; }
+  }
+
+  /* ── NAV LINK BAR ── */
+  .nav-bar {
+    background: var(--accent);
+    color: white;
+    padding: 0.6rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+  .nav-bar a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.9;
+    transition: opacity 0.15s;
+  }
+  .nav-bar a:hover { opacity: 1; }
+  @media (max-width: 900px) { .nav-bar { padding: 0.6rem 1.5rem; } }
+</style>
+</head>
+<body>
+
+<div class="nav-bar">
+  <span>FCIP PRODUCT TOOLING — PROMPT BANK</span>
+  <a href="fcip-agentic-roadmap.html">VIEW AGENTIC ROADMAP →</a>
+</div>
+
+<header>
+  <div>
+    <div class="header-kicker">Financial Crime Investigations Platform</div>
+    <h1>Product <span>Prompt Bank</span></h1>
+    <p class="header-sub">15 structured prompts for FCIP product teams — from epic inception to go-live communications. Paste into ChatGPT or Claude. Always start with the FC Context block.</p>
+  </div>
+  <div class="header-meta">
+    <strong>15 Prompts</strong>
+    Tiers 1–3<br>
+    AML · KYC · SAR · Compliance
+  </div>
+</header>
+
+<div class="tier-legend">
+  <span class="tier-legend-label">How to use</span>
+  <span class="tier-pill t1">Tier 1 — Paste &amp; go today</span>
+  <span class="tier-pill t2">Tier 2 — Needs structured input</span>
+  <span class="tier-pill t3">Tier 3 — Jira export as input</span>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" class="search-input" placeholder="Search prompts…" id="searchInput" oninput="filterPrompts()">
+  </div>
+  <button class="filter-btn active" onclick="filterTier('all', this)">All</button>
+  <button class="filter-btn" onclick="filterTier('1', this)">Tier 1</button>
+  <button class="filter-btn" onclick="filterTier('2', this)">Tier 2</button>
+  <button class="filter-btn" onclick="filterTier('3', this)">Tier 3</button>
+  <span class="result-count" id="resultCount">15 prompts</span>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Foundation</div>
+      <a class="sidebar-link" onclick="navTo('context')"><span class="dot" style="background:#c8421a"></span>FC Context Reference</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Delivery Planning</div>
+      <a class="sidebar-link" onclick="navTo('epics')"><span class="dot" style="background:var(--tier1)"></span>Epic Creation</a>
+      <a class="sidebar-link" onclick="navTo('stories')"><span class="dot" style="background:var(--tier1)"></span>Story Generation</a>
+      <a class="sidebar-link" onclick="navTo('dor')"><span class="dot" style="background:var(--tier1)"></span>Definition of Ready</a>
+      <a class="sidebar-link" onclick="navTo('acs')"><span class="dot" style="background:var(--tier1)"></span>Acceptance Criteria</a>
+      <a class="sidebar-link" onclick="navTo('splitting')"><span class="dot" style="background:var(--tier1)"></span>Story Splitting</a>
+      <a class="sidebar-link" onclick="navTo('nfr')"><span class="dot" style="background:var(--tier1)"></span>NFR Capture</a>
+      <a class="sidebar-link" onclick="navTo('backlog')"><span class="dot" style="background:var(--tier2)"></span>Backlog Refinement</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Sprint Ceremonies</div>
+      <a class="sidebar-link" onclick="navTo('sprint-goal')"><span class="dot" style="background:var(--tier1)"></span>Sprint Goal</a>
+      <a class="sidebar-link" onclick="navTo('sprint-planning')"><span class="dot" style="background:var(--tier1)"></span>Sprint Planning</a>
+      <a class="sidebar-link" onclick="navTo('retro')"><span class="dot" style="background:var(--tier1)"></span>Retrospective</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Roadmap & Reporting</div>
+      <a class="sidebar-link" onclick="navTo('roadmap')"><span class="dot" style="background:var(--tier3)"></span>Roadmap Generator</a>
+      <a class="sidebar-link" onclick="navTo('stakeholder')"><span class="dot" style="background:var(--tier2)"></span>Stakeholder Update</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Enablement</div>
+      <a class="sidebar-link" onclick="navTo('training')"><span class="dot" style="background:var(--tier2)"></span>Training Pack</a>
+      <a class="sidebar-link" onclick="navTo('comms')"><span class="dot" style="background:var(--tier2)"></span>User Communications</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Other Resources</div>
+      <a class="sidebar-link" href="fcip-agentic-roadmap.html" style="color:var(--accent);font-weight:500"><span class="dot" style="background:var(--tier4)"></span>Agentic Roadmap →</a>
+    </div>
+  </aside>
+
+  <main class="prompt-area">
+    <!-- ══ CONTEXT REFERENCE ══ -->
+    <div id="context" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Financial Crime Context Reference</span>
+        <span class="section-count">Paste at the top of any session</span>
+      </div>
+
+      <div class="context-card">
+        <div>
+          <h2>Why this file exists</h2>
+          <p>Paste this context block at the start of any AI session to ground responses in the regulatory, domain, and platform specifics of financial crime investigations. It prevents generic agile outputs and ensures every story, epic, or comm reflects real compliance obligations.</p>
+          <p style="color:#c8a060; font-family:'DM Mono',monospace; font-size:0.72rem; letter-spacing:0.05em;">↓ Copy the block on the right into your prompt before anything else</p>
+          <button class="btn-copy" style="margin-top:1rem" onclick="copyContext()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            COPY CONTEXT BLOCK
+          </button>
+        </div>
+        <div>
+          <div class="context-block" id="contextBlock">## FINANCIAL CRIME INVESTIGATIONS PLATFORM — AI SESSION CONTEXT
+
+**Platform Identity**
+You are assisting a product team building the Financial Crime Investigations Platform (FCIP) at a tier-1 multinational bank. FCIP is a pure investigation layer — it consumes structured DetectionEvents from upstream detection systems (transaction monitoring, screening, fraud engines) rather than performing detection itself. The commercial position is "bring your own detection."
+
+**Regulatory Frameworks in Scope**
+- UK: POCA 2002, Terrorism Act 2000, MLRs 2017, JMLSG Guidance, NCA SAR/DAML regime, FCA SYSC
+- EU/Global: FATF 40 Recommendations, 6AMLD, EBA AML/CFT Guidelines, FATF Travel Rule
+- US: BSA, FinCEN SAR XML 2.0 schema, OFAC SDN sanctions
+- APAC: MAS Notice SFA/FAA (Singapore), AUSTRAC, regional STR obligations
+
+**Core Domain Terminology**
+- AML: Anti-Money Laundering
+- SAR/STR: Suspicious Activity Report / Suspicious Transaction Report
+- DAML: Defence Against Money Laundering (consent SAR)
+- KYC/CDD/EDD: Know Your Customer / Customer Due Diligence / Enhanced Due Diligence
+- TMS: Transaction Monitoring System
+- DetectionEvent: The structured contract at FCIP's system boundary (alert from upstream)
+- Case: An investigation record grouping one or more DetectionEvents
+- Typology: A recognised money laundering or financial crime pattern (e.g. smurfing, layering, trade-based ML)
+- Composite Risk Score: A weighted aggregation of entity, behaviour, geography, and network risk signals
+- 3-Lines of Defence: 1LoD (business), 2LoD (compliance/risk), 3LoD (internal audit)
+
+**Platform Architecture (high level)**
+Spring Boot 3.4 / Java 21 microservices, React frontend, PostgreSQL, Kafka event streaming, Kubernetes. Integrations: Jira (work tracking), Confluence (documentation), screening providers (World-Check, Dow Jones, ComplyAdvantage, OFAC SDN).
+
+**Product Team Norms**
+- Stories must meet Definition of Ready before sprint entry
+- 3 Amigos = Product Owner + Developer + QA/Tester perspective required
+- SAR narrative generation is a regulated output — accuracy and audit trail are non-negotiable
+- All features must consider data residency (UK/EU/APAC jurisdictions)
+- Compliance sign-off is required for SAR/regulatory reporting features</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EPIC CREATION ══ -->
+    <div id="epics" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Epic Creation</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="epic planning">
+          <div class="card-meta">
+            <div class="card-title">Epic Creation from Goal Statement</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Transforms a high-level product goal into a structured Jira-ready epic with business context, success metrics, and compliance flags — grounded in FCIP domain language.</p>
+          <div class="card-tags">
+            <span class="tag">epic</span><span class="tag">planning</span><span class="tag">jira-ready</span>
+          </div>
+          <div class="prompt-text" id="pt-epic1">## EPIC CREATION — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Goal Statement:**
+[Describe the product goal in 2-3 sentences, e.g. "We need to allow investigators to attach external documents to a case and have them indexed for search, so that evidence is centralised and auditable."]
+
+---
+
+Using the FCIP context provided, produce a structured epic with the following sections:
+
+**1. Epic Title** — Clear, verb-led, Jira-friendly (max 10 words)
+
+**2. Epic Goal** — One sentence stating what we are building and why
+
+**3. Business Value** — 3 bullet points: customer/investigator benefit, compliance/regulatory benefit, operational efficiency gain
+
+**4. Scope Boundary**
+- In scope: (what this epic covers)
+- Out of scope: (explicit exclusions to prevent scope creep)
+- Dependencies: (upstream systems, teams, or data contracts required)
+
+**5. Success Metrics** — 3–5 measurable outcomes (e.g. "SAR submission time reduced by X%", "100% of cases have audit trail")
+
+**6. Compliance & Risk Flags** — List any regulatory touchpoints (SAR, DAML, data residency, FCA, NCA) that require compliance sign-off
+
+**7. Suggested Child Epics or Feature Areas** — If this epic is large, suggest how it could be broken down
+
+**8. Acceptance Criteria (Epic Level)** — 3–5 high-level criteria that define epic completion
+
+Output as structured markdown suitable for pasting into a Jira epic description field.</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-epic1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-epic1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ USER STORY REFINEMENT ══ -->
+    <div id="stories" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">User Story Generation</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="stories refinement">
+          <div class="card-meta">
+            <div class="card-title">Stories from Epic Goal</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Breaks an epic down into well-formed user stories with personas drawn from the FCIP investigator/compliance officer/analyst context.</p>
+          <div class="card-tags">
+            <span class="tag">user-stories</span><span class="tag">decomposition</span><span class="tag">personas</span>
+          </div>
+          <div class="prompt-text" id="pt-story1">## USER STORY GENERATION FROM EPIC — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Epic Title:**
+[Paste epic title]
+
+**Epic Goal:**
+[Paste the one-sentence epic goal]
+
+**Key Personas to consider for this epic:**
+[Select relevant ones or add your own:]
+- Financial Investigator (1LoD case worker)
+- Senior Investigator / Team Lead
+- Compliance Officer (2LoD reviewer)
+- System Administrator
+- Audit / 3LoD reviewer
+- [Add other personas relevant to this epic]
+
+---
+
+Generate a full set of user stories that collectively deliver this epic. For each story:
+
+**Format each story as:**
+
+---
+**Story [N]: [Short title]**
+**As a** [persona]
+**I want to** [action/capability]
+**So that** [business/compliance value]
+
+**Context:** [1-2 sentences of domain context explaining why this matters in a financial crime investigation workflow]
+
+**Notes for refinement:** [Any assumptions made, edge cases to discuss, or dependencies to resolve]
+---
+
+**After listing all stories:**
+- Flag any stories that have compliance/regulatory implications requiring 2LoD sign-off
+- Identify the minimum viable story set for an initial release
+- Note any stories that are likely candidates for technical spikes
+
+Aim for stories that are independently deliverable and testable. Avoid coupling multiple behaviours in a single story.</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-story1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-story1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ DEFINITION OF READY ══ -->
+    <div id="dor" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Definition of Ready + 3 Amigos</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="stories DoR 3amigos">
+          <div class="card-meta">
+            <div class="card-title">Definition of Ready + 3 Amigos</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Takes a rough story and stress-tests it against the DoR checklist from the Product, Dev, and QA perspective — surfaces gaps before sprint entry.</p>
+          <div class="card-tags">
+            <span class="tag">DoR</span><span class="tag">3-amigos</span><span class="tag">refinement</span><span class="tag">quality</span>
+          </div>
+          <div class="prompt-text" id="pt-dor1">## DEFINITION OF READY + 3 AMIGOS REFINEMENT — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Story to refine:**
+[Paste the full user story here, including any existing acceptance criteria]
+
+---
+
+Evaluate this story against the FCIP Definition of Ready. For each criterion, state: ✅ Met / ⚠️ Partial / ❌ Not Met, with a brief explanation.
+
+**Definition of Ready Checklist:**
+1. Story is written in standard format (As a / I want / So that)
+2. Business value is clearly articulated
+3. Acceptance criteria are present, testable, and unambiguous
+4. Story is independent (or dependencies are explicitly stated)
+5. Story is estimated / size is understood (not a multi-sprint monster)
+6. Regulatory/compliance implications have been identified
+7. Edge cases and error states are documented
+8. UI/UX designs or wireframes are referenced (if applicable)
+9. API contracts or data schemas are agreed (if applicable)
+10. Non-functional requirements are captured (performance, security, audit logging)
+
+---
+
+**3 Amigos Analysis:**
+
+Respond as each voice in turn:
+
+🎯 **Product Owner perspective:**
+- Is the business value clear and correctly prioritised?
+- Does the story align with the FCIP epic/roadmap intent?
+- Are there scope creep risks? Any missing edge cases from a user journey perspective?
+- Questions I would ask in refinement:
+
+🛠️ **Developer perspective:**
+- Is this technically clear enough to estimate?
+- What ambiguities need resolving before we can build?
+- What technical risks or architectural implications exist?
+- Questions I would ask in refinement:
+
+🧪 **QA / Tester perspective:**
+- Can every acceptance criterion be tested with a clear pass/fail?
+- What test scenarios are missing (happy path, sad path, edge cases)?
+- Are there regulatory/audit trail assertions that need explicit test coverage?
+- Questions I would ask in refinement:
+
+---
+
+**Verdict:**
+- Ready for sprint: Yes / No / Conditional
+- Outstanding items before sprint entry: [Numbered list]
+- Suggested rewrite of acceptance criteria (if needed): [Provide improved ACs in Gherkin Given/When/Then format]</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-dor1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-dor1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ ACCEPTANCE CRITERIA ══ -->
+    <div id="acs" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Acceptance Criteria Writer</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="acceptance criteria gherkin quality">
+          <div class="card-meta">
+            <div class="card-title">Acceptance Criteria Writer (Gherkin)</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Writes complete, testable acceptance criteria in Gherkin Given/When/Then format — covering happy path, sad path, edge cases, and compliance-specific assertions for FCIP features.</p>
+          <div class="card-tags">
+            <span class="tag">acceptance-criteria</span><span class="tag">gherkin</span><span class="tag">BDD</span><span class="tag">quality</span>
+          </div>
+          <div class="prompt-text" id="pt-acs1">## ACCEPTANCE CRITERIA WRITER — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Story:**
+[Paste the user story — As a / I want / So that]
+
+**What we know about this feature:**
+[Describe the intended behaviour, any wireframes/designs, API details, or business rules you have. Be as specific as possible.]
+
+**Specific compliance/regulatory rules that apply (if known):**
+[e.g. "SAR must not be submitted without a supervisory review step", "Audit log entry must include user ID, timestamp, and reason code", "DAML consent SARs must be flagged separately from intelligence SARs"]
+
+---
+
+Generate comprehensive acceptance criteria in the following structure:
+
+**HAPPY PATH SCENARIOS**
+For each core user journey through this feature:
+```
+Scenario: [Descriptive name]
+  Given [initial state / preconditions]
+  When [user action or system trigger]
+  Then [expected outcome]
+  And [additional assertions if needed]
+```
+
+**SAD PATH / ERROR SCENARIOS**
+Cover: invalid input, missing required fields, unauthorised access attempts, system unavailability, concurrent edit conflicts.
+
+**EDGE CASES**
+Cover: boundary values, empty states, maximum limits, unusual but valid data combinations.
+
+**COMPLIANCE & AUDIT ASSERTIONS**
+Mandatory for any feature touching case management, SAR, or user actions:
+```
+Scenario: Audit trail is created on [action]
+  Given a user with role [X] is logged in
+  When they [perform action]
+  Then an audit log entry is created containing:
+    | field        | value                    |
+    | user_id      | authenticated user ID    |
+    | timestamp    | UTC timestamp of action  |
+    | action_type  | [specific action code]   |
+    | entity_id    | [case/SAR/entity ID]     |
+    | outcome      | success / failure        |
+```
+
+**NON-FUNCTIONAL ASSERTIONS**
+Include at least:
+- Performance: response time under normal load
+- Security: authorisation checks (role-based access)
+- Data integrity: no partial writes on failure
+
+**FINAL CHECKLIST**
+Before handing to QA, verify each AC:
+- [ ] Independently testable (pass/fail, no ambiguity)
+- [ ] Written from user perspective not implementation
+- [ ] Covers the "what", not the "how"
+- [ ] Compliance assertions are explicit and verifiable
+- [ ] Negative paths are as detailed as positive paths</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-acs1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-acs1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ STORY SPLITTING ══ -->
+    <div id="splitting" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Story Splitting Guide</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="story splitting vertical slicing INVEST">
+          <div class="card-meta">
+            <div class="card-title">Story Splitting & Vertical Slicing</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Diagnoses oversized stories and applies SPIDR/vertical slicing patterns to split them into sprint-deliverable pieces — while preserving compliance integrity at each slice.</p>
+          <div class="card-tags">
+            <span class="tag">story-splitting</span><span class="tag">SPIDR</span><span class="tag">INVEST</span><span class="tag">vertical-slice</span>
+          </div>
+          <div class="prompt-text" id="pt-split1">## STORY SPLITTING & VERTICAL SLICING — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Story to split:**
+[Paste the full story including any existing acceptance criteria and current estimate]
+
+**Why this story needs splitting:**
+[e.g. "Estimated at 21 story points", "Has 3 different user personas", "Contains both UI work and a new backend API", "Mixes core functionality with compliance reporting"]
+
+---
+
+**Step 1: INVEST Assessment**
+Evaluate the story against each INVEST criterion:
+- **I**ndependent — can it be delivered without another story?
+- **N**egotiable — is the scope flexible or locked?
+- **V**aluable — does it deliver end-to-end value to a user?
+- **E**stimable — is it understood well enough to size?
+- **S**mall — can it be completed within a sprint?
+- **T**estable — can it be verified with clear pass/fail criteria?
+
+For each criterion: ✅ Good / ⚠️ Concern / ❌ Failing — with explanation.
+
+**Step 2: Splitting Pattern Diagnosis**
+Identify which SPIDR patterns apply to this story:
+- **S**pike — Is there technical uncertainty requiring investigation first?
+- **P**ath — Are there different user journeys through this feature?
+- **I**nterface — Can we deliver with a simpler UI first, then enhance?
+- **D**ata — Are there data variations that could be phased (e.g. UK only → APAC later)?
+- **R**ules — Are there business rules that could be deferred (e.g. basic validation → advanced compliance rules later)?
+
+**Step 3: Proposed Split**
+For each child story produced by the split:
+
+---
+**Child Story [N]: [Title]**
+**As a** [persona]
+**I want to** [action]
+**So that** [value]
+**Estimated size:** [S/M/L or points]
+**Compliance integrity:** [Does this slice stand alone from a regulatory perspective, or does it require a companion story to be compliant?]
+**Delivery order:** [Must be first / Can be parallel / Must follow story N]
+---
+
+**Step 4: Compliance Integrity Check**
+For financial crime features, splitting carries risk. Confirm:
+- No split story creates a partially-compliant state in production (e.g. audit log omitted from v1)
+- If a compliance-critical element is deferred, it must be captured as a P1 story immediately
+- SAR and DAML flows must never be split across releases without compliance sign-off
+
+**Step 5: Recommended Sprint Sequence**
+Which child stories should go into the next sprint, and in what order?</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-split1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-split1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ NFR CAPTURE ══ -->
+    <div id="nfr" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Non-Functional Requirements</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="NFR non-functional security performance compliance">
+          <div class="card-meta">
+            <div class="card-title">NFR Capture for FCIP Features</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Generates a complete non-functional requirements checklist for any FCIP feature — covering performance, security, auditability, data residency, and regulatory obligations specific to financial crime platforms.</p>
+          <div class="card-tags">
+            <span class="tag">NFR</span><span class="tag">security</span><span class="tag">performance</span><span class="tag">data-residency</span><span class="tag">audit</span>
+          </div>
+          <div class="prompt-text" id="pt-nfr1">## NON-FUNCTIONAL REQUIREMENTS CAPTURE — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Feature / Epic:**
+[Paste feature name and brief description]
+
+**Feature Classification:**
+[Choose all that apply:]
+- [ ] Case management (create/update/close investigations)
+- [ ] SAR / STR / DAML generation or submission
+- [ ] Screening / adverse media / sanctions check
+- [ ] Document management (upload, storage, retrieval)
+- [ ] Reporting / analytics / dashboard
+- [ ] Configuration / administration
+- [ ] External API integration
+- [ ] Data ingestion / DetectionEvent processing
+
+**Expected Scale:**
+[e.g. "1,200 investigators across UK/EU/APAC", "Processing 50,000 DetectionEvents/day", "Peak SAR submission volume: 500/day at month-end"]
+
+---
+
+Generate a complete NFR specification covering:
+
+**1. PERFORMANCE**
+- Response time targets (p50, p95, p99 for key user interactions)
+- Throughput requirements (requests/second, events/second)
+- Batch processing windows (if applicable)
+- Degraded mode behaviour (what must still work if a dependency is slow?)
+
+**2. AVAILABILITY & RESILIENCE**
+- SLA target (e.g. 99.9% during business hours)
+- RTO / RPO for disaster recovery
+- Behaviour when upstream systems (TMS, screening providers) are unavailable
+- Circuit breaker and retry policy requirements
+
+**3. SECURITY**
+- Authentication: What session/token model is required?
+- Authorisation: Role-based access control requirements (Investigator / Senior Investigator / Compliance Officer / Admin)
+- Data in transit: TLS version requirements
+- Data at rest: Encryption requirements (especially for SAR narrative content)
+- Sensitive field masking (PII, account numbers in logs)
+- Input validation and injection prevention
+
+**4. AUDITABILITY (REGULATORY CRITICAL)**
+For financial crime platforms, this section is non-negotiable:
+- Every user action that modifies a case, SAR, or entity record must generate an immutable audit log entry
+- Required audit fields: user_id, role, timestamp (UTC), action_type, entity_type, entity_id, before_state (hash), after_state (hash), outcome, ip_address
+- Audit logs must be: append-only, tamper-evident, retained for [7 years per MLRs 2017], exportable for regulatory requests
+- SAR submissions must log: submission timestamp, submitter ID, supervisory reviewer ID, NCA reference received
+
+**5. DATA RESIDENCY & SOVEREIGNTY**
+- UK customer data: must remain within UK data centres (post-Brexit)
+- EU customer data: GDPR Article 44+ cross-border transfer controls
+- APAC: MAS TRM Guidelines — data localisation requirements for Singapore entities
+- Identify which data fields are jurisdiction-specific and must not cross borders
+
+**6. REGULATORY & COMPLIANCE**
+- Data retention: specify minimum retention period per regulation
+- Right to erasure (GDPR): document which fields are exempt due to AML/CTF obligations (retained over erasure requests)
+- SAR confidentiality (tipping-off prohibition): ensure no UI element can inadvertently expose SAR existence to subject
+- MiFID II / SYSC record-keeping: applicable fields and retention
+
+**7. OBSERVABILITY**
+- Logging: what must be logged at INFO/WARN/ERROR level
+- Metrics: key business metrics to instrument (e.g. case_opened_count, sar_submitted_count, alert_triage_time_seconds)
+- Alerting: what conditions should trigger PagerDuty/ops alerts
+- Distributed tracing: trace ID propagation requirements across microservices
+
+**8. TESTABILITY**
+- Test environment data: can synthetic/anonymised data be used, or is production-like data needed?
+- Compliance test scenarios: which regulatory scenarios need dedicated test coverage?
+- Performance test: load test targets and acceptance criteria
+
+**Output format:** Structured specification suitable for inclusion in an epic or as a linked Confluence NFR page.</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-nfr1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-nfr1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ BACKLOG REFINEMENT ══ -->
+    <div id="backlog" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Backlog Refinement</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier2)" data-tier="2" data-tags="backlog prioritisation">
+          <div class="card-meta">
+            <div class="card-title">Backlog Refinement & Prioritisation</div>
+            <span class="card-tier tier-pill t2">Tier 2</span>
+          </div>
+          <p class="card-desc">Takes a pasted list of backlog items and produces a prioritised, annotated backlog with RICE scoring adapted for compliance-driven financial crime products.</p>
+          <div class="card-tags">
+            <span class="tag">backlog</span><span class="tag">RICE</span><span class="tag">prioritisation</span>
+          </div>
+          <div class="prompt-text" id="pt-backlog1">## BACKLOG REFINEMENT SESSION — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Current Sprint / Quarter:**
+[e.g. Sprint 14 / Q3 2026]
+
+**Strategic Focus for this period:**
+[e.g. "Completing SAR submission workflow for UK go-live" or "Reducing investigator case triage time"]
+
+**Backlog Items (paste your list):**
+[Format each item as: ID | Title | Brief description | Current estimate (if known)]
+Example:
+- FCIP-101 | Case document upload | Allow investigators to attach PDFs to a case | 5sp
+- FCIP-102 | Duplicate alert suppression | Merge duplicate DetectionEvents into single case | 8sp
+- FCIP-103 | SAR narrative template editor | Allow compliance to edit SAR narrative templates | 13sp
+
+---
+
+For each backlog item, produce a refinement assessment:
+
+**1. RICE Priority Score** (adapted for compliance products)
+- **Reach:** How many investigators/users does this impact per sprint? (1–5 scale)
+- **Impact:** Compliance obligation (mandatory=5) vs. nice-to-have (1)? 
+- **Confidence:** How well understood is this item? (%)
+- **Effort:** Story points (inverse — fewer points = higher score)
+- **RICE Score:** (Reach × Impact × Confidence) / Effort
+
+**2. Readiness Assessment:** Ready / Needs refinement / Blocked (with reason)
+
+**3. Risk flags:** Regulatory deadline, dependency, or compliance sign-off required?
+
+**4. Recommendation:** Sprint candidate / Next sprint / Backlog / Spike needed
+
+---
+
+**Output:**
+- Ranked backlog table (highest RICE first)
+- Top 5 recommended items for the next sprint with justification
+- Items that need a refinement session before they can be estimated
+- Any items that should be split before sprint entry</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-backlog1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-backlog1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ SPRINT CEREMONIES ══ -->
+    <div id="sprint-goal" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Sprint Goal Creation</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="sprint goal planning">
+          <div class="card-meta">
+            <div class="card-title">Sprint Goal Creation</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Crafts a compelling, outcome-focused sprint goal from a list of committed stories — avoiding task lists and focusing on investigator/compliance value delivered.</p>
+          <div class="card-tags">
+            <span class="tag">sprint</span><span class="tag">goal</span><span class="tag">planning</span>
+          </div>
+          <div class="prompt-text" id="pt-sprint1">## SPRINT GOAL CREATION — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Sprint Number / Dates:**
+[e.g. Sprint 15 | 2 June – 13 June 2026]
+
+**Team Capacity Notes:**
+[e.g. "Full team, 7 developers, 2 QA — 60 story points capacity" or note any absences]
+
+**Committed Stories for this Sprint:**
+[Paste story titles and brief descriptions]
+Example:
+- FCIP-205: Investigator can view all DetectionEvents linked to a case on a timeline
+- FCIP-206: System generates audit log entry on every case state transition
+- FCIP-207: SAR draft can be saved without submission
+- FCIP-208 (carry-over): Case assignment to investigator team queue
+
+---
+
+**Sprint Goal Guidelines:**
+A good sprint goal should:
+- Express the *outcome* for the investigator or compliance user, not a list of tasks
+- Be achievable within the sprint if circumstances change (some stories may be dropped but the goal is still achievable)
+- Be understandable to a stakeholder outside the team
+- Connect to the broader product milestone or regulatory delivery
+
+**Generate:**
+1. **Primary Sprint Goal** — 1–2 sentences, outcome-focused, investigator/compliance value led
+2. **Alternative Goal (B)** — A slightly different framing for the team to discuss
+3. **Goal Sense-Check** — Does this goal survive if 1 story slips? Explain.
+4. **Stakeholder Summary Line** — One sentence suitable for a status update email or Confluence sprint page
+5. **Sprint Risks** — Top 2 risks that could prevent goal achievement</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-sprint1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-sprint1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ RETROSPECTIVE ══ -->
+    <div id="retro" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Sprint Retrospective</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="retrospective sprint ceremony">
+          <div class="card-meta">
+            <div class="card-title">Sprint Retrospective Facilitator</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Generates a structured retrospective agenda, themed discussion prompts, and formats team inputs into actionable improvement items with owners.</p>
+          <div class="card-tags">
+            <span class="tag">retrospective</span><span class="tag">ceremony</span><span class="tag">improvement</span>
+          </div>
+          <div class="prompt-text" id="pt-retro1">## SPRINT RETROSPECTIVE — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Sprint Number:**
+[e.g. Sprint 15]
+
+**Sprint Goal (was it achieved?):**
+[Paste goal and state: Achieved / Partially achieved / Not achieved]
+
+**What happened this sprint (brief summary):**
+[e.g. Completed SAR draft save feature, audit log delayed due to schema ambiguity, stakeholder demo well received, 2 stories carried over]
+
+**Team Retro Input (paste raw notes, sticky notes, or bullet points from the team):**
+[Format: attribution optional — just paste the raw feedback]
+Example:
+- "The schema change mid-sprint killed our velocity"
+- "Good energy in the 3 amigos session for the audit log story"  
+- "Still unclear who owns compliance AC sign-off"
+- "Demo prep took too long"
+
+---
+
+**Produce a structured retrospective output:**
+
+**1. What Went Well (Celebrate)**
+- Group and theme the positives
+- Identify practices to reinforce or formalise
+
+**2. What Could Be Better (Improve)**
+- Group and theme the pain points
+- For each theme: root cause analysis (5-whys where useful)
+
+**3. Action Items** — Table format:
+| Action | Owner Role | Due | Success Measure |
+Each action should be specific, owned, and time-boxed. Max 5 actions (quality over quantity).
+
+**4. Process Health Indicators** (rate 1–5 with comment):
+- Story readiness at sprint start
+- Clarity of acceptance criteria  
+- Cross-functional collaboration (3 Amigos effectiveness)
+- Compliance/regulatory clarity
+- Team communication & psychological safety
+
+**5. One Thing to Carry Forward**
+A single sentence the team can rally around for next sprint.</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-retro1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-retro1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ SPRINT PLANNING ══ -->
+    <div id="sprint-planning" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Sprint Planning Assistant</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier1)" data-tier="1" data-tags="sprint planning capacity">
+          <div class="card-meta">
+            <div class="card-title">Sprint Planning Assistant</div>
+            <span class="card-tier tier-pill t1">Tier 1</span>
+          </div>
+          <p class="card-desc">Helps facilitate sprint planning — validates story readiness, flags capacity risks, and ensures regulatory/compliance stories are correctly sequenced.</p>
+          <div class="card-tags">
+            <span class="tag">sprint</span><span class="tag">planning</span><span class="tag">capacity</span>
+          </div>
+          <div class="prompt-text" id="pt-planning1">## SPRINT PLANNING ASSISTANT — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Sprint Number & Dates:**
+[Sprint N | Start date – End date]
+
+**Team Capacity:**
+[e.g. 7 devs × 8 points/dev = 56 points. Minus 10 points for ceremonies/BAU = 46 available points]
+
+**Proposed Sprint Stories (from refined backlog):**
+[List each story with: ID | Title | Points | DoR Status (Ready/Partial)]
+
+**Current Release / Milestone Context:**
+[e.g. "UK go-live is Sprint 18. We are in Sprint 15. SAR submission must be complete by Sprint 16."]
+
+---
+
+**Sprint Planning Analysis:**
+
+**1. Capacity Sense-Check**
+- Total points proposed vs. available
+- Recommendation: over-committed / on target / room for a stretch goal?
+
+**2. Story Readiness Gate**
+For any story marked Partial DoR:
+- Flag the specific gaps
+- Recommend: include with caveats / defer to next sprint / timebox spike
+
+**3. Sequencing & Dependencies**
+- Are there stories that must be completed before others can start?
+- Draw a simple dependency chain (text-based)
+- Flag any stories blocked on external teams, APIs, or compliance sign-off
+
+**4. Risk Assessment**
+- Highest risk story (complexity, dependency, or regulatory sensitivity)
+- Mitigation suggestion for each risk
+
+**5. Sprint Commitment Recommendation**
+- Final recommended story set
+- Stretch goal candidate (if capacity allows)
+- Stories to defer with reasons
+
+**6. Sprint Goal Suggestion**
+Based on the committed stories, suggest a sprint goal.</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-planning1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-planning1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ ROADMAP ══ -->
+    <div id="roadmap" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Roadmap Generator</span>
+        <span class="section-count">1 prompt — Tier 3 (Jira export as input)</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier3)" data-tier="3" data-tags="roadmap jira planning">
+          <div class="card-meta">
+            <div class="card-title">Roadmap from Jira Export</div>
+            <span class="card-tier tier-pill t3">Tier 3</span>
+          </div>
+          <p class="card-desc">Takes a Jira CSV/JSON export of epics and stories and generates a narrative roadmap, milestone timeline, and executive summary. Export Jira board → paste here.</p>
+          <div class="card-tags">
+            <span class="tag">roadmap</span><span class="tag">jira-export</span><span class="tag">milestones</span><span class="tag">executive</span>
+          </div>
+          <div class="prompt-text" id="pt-roadmap1">## ROADMAP GENERATOR FROM JIRA DATA — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**How to export from Jira:**
+Jira Board → Backlog → Export → CSV (or use the Jira roadmap view and copy the epic list)
+
+**Paste your Jira export data below:**
+[Paste CSV rows or a structured list of epics/stories with: Epic Name | Status | Target Quarter | Priority | Labels/Components]
+
+Example format acceptable:
+Epic Name | Status | Quarter | Priority | Notes
+SAR Submission Workflow | In Progress | Q2 2026 | P1 | Regulatory deadline Jun 2026
+Case Management - Core | Done | Q1 2026 | P1 | —
+Document Management | To Do | Q3 2026 | P2 | Dependent on storage architecture
+Screening Integration | In Progress | Q2 2026 | P1 | World-Check + ComplyAdvantage
+
+**Current Date / Quarter:**
+[e.g. June 2026 — Q2 2026]
+
+**Audience for this roadmap:**
+[Choose: Executive / Compliance Stakeholders / Engineering Team / Regulators / All]
+
+---
+
+**Generate the following:**
+
+**1. Roadmap Summary (Executive Narrative)**
+2–3 paragraphs covering: where we are today, what is being delivered this quarter, and the 6–12 month horizon. Written for a senior stakeholder who understands AML but not agile.
+
+**2. Milestone Timeline** (text-based Gantt or quarter grid)
+Quarter | Key Deliverables | Status | Regulatory Significance
+
+**3. Epics by Theme**
+Group epics into themes (e.g. Investigation Core / Regulatory Reporting / Screening & Enrichment / Platform & Infrastructure) with status and quarter.
+
+**4. Regulatory Calendar Overlay**
+Flag any epics with known regulatory deadlines or compliance dependencies.
+
+**5. Risks & Dependencies**
+Top 3 roadmap risks with likelihood and impact.
+
+**6. What's Not on the Roadmap**
+Items explicitly deferred and why — important for stakeholder alignment.
+
+**7. Confluence-Ready Format**
+Reformat the summary as a Confluence page outline with suggested headings, table of contents, and emoji status indicators (🟢🟡🔴).</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-roadmap1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-roadmap1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ STAKEHOLDER UPDATE ══ -->
+    <div id="stakeholder" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Stakeholder Status Update</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier2)" data-tier="2" data-tags="stakeholder status update reporting executive">
+          <div class="card-meta">
+            <div class="card-title">Stakeholder & Executive Status Update</div>
+            <span class="card-tier tier-pill t2">Tier 2</span>
+          </div>
+          <p class="card-desc">Converts sprint data and delivery context into a crisp executive status update — RAG-rated, milestone-focused, and calibrated for compliance steering committee audiences.</p>
+          <div class="card-tags">
+            <span class="tag">stakeholder</span><span class="tag">executive</span><span class="tag">RAG</span><span class="tag">status</span>
+          </div>
+          <div class="prompt-text" id="pt-stakeholder1">## STAKEHOLDER STATUS UPDATE — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Reporting Period:**
+[e.g. Sprint 15 | 2–13 June 2026 | or "June 2026 monthly update"]
+
+**Audience:**
+[Choose: Steering Committee / Executive Sponsor / Compliance Director / Programme Board / All]
+
+**Overall RAG Status:**
+[🟢 Green / 🟡 Amber / 🔴 Red — and your one-line reason]
+
+**What was delivered this period:**
+[List completed epics, stories, or milestones — be specific]
+e.g.:
+- SAR draft auto-save feature: live in test environment
+- Case audit log: delivered and signed off by compliance
+- World-Check screening integration: API contract agreed, development started
+
+**What is in progress:**
+[Current sprint / workstream status]
+
+**Upcoming milestones (next 4–6 weeks):**
+[List key deliverables and target dates]
+
+**Issues, risks, or blockers:**
+[Paste any current blockers, risks, or decisions needed from stakeholders]
+e.g.:
+- Risk: NCA SAR portal API specification delayed — may impact Sprint 17 SAR submission feature
+- Decision needed: Data residency architecture for APAC region — awaiting Legal sign-off
+- Blocker: Compliance team capacity for UAT sign-off in Sprint 16
+
+**Budget / resource notes (if applicable):**
+[Any headcount, vendor, or cost flags]
+
+---
+
+Generate a complete stakeholder update in the following formats:
+
+**FORMAT A — STEERING COMMITTEE SLIDE NARRATIVE**
+(What you'd say to accompany a status slide — 3 paragraphs)
+- Para 1: Where we are and overall health
+- Para 2: Key achievements this period and their significance
+- Para 3: What's coming and what decisions/support is needed
+
+**FORMAT B — EMAIL STATUS UPDATE**
+Subject line + body suitable for a Monday morning exec distribution list.
+- Tone: Confident, direct, not defensive about amber/red status
+- Include: RAG summary table, key highlights, decisions required
+- Length: 250–350 words
+
+**FORMAT C — RAG DASHBOARD SUMMARY TABLE**
+| Area | Status | This Period | Next 4 Weeks | Owner |
+Rows for: Delivery Progress / Regulatory Milestones / Technical Risks / Resource & Capacity / Stakeholder Engagement
+
+**FORMAT D — PROGRAMME BOARD ONE-PAGER**
+Structured as:
+- Executive Summary (2 sentences)
+- Milestone Tracker (table: Milestone | Target | Status | Comment)
+- Risks & Issues (top 3, with RAG and mitigation)
+- Decisions Required (bullet list with deadline)
+- Horizon: Next Period Focus</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-stakeholder1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-stakeholder1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ TRAINING ══ -->
+    <div id="training" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">Training Pack Generation</span>
+        <span class="section-count">1 prompt</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier2)" data-tier="2" data-tags="training enablement learning">
+          <div class="card-meta">
+            <div class="card-title">Training Pack from Epic / Design</div>
+            <span class="card-tier tier-pill t2">Tier 2</span>
+          </div>
+          <p class="card-desc">Generates a structured investigator training pack from an epic description and/or code design — covering workflow, compliance context, and practical exercises.</p>
+          <div class="card-tags">
+            <span class="tag">training</span><span class="tag">enablement</span><span class="tag">L&D</span>
+          </div>
+          <div class="prompt-text" id="pt-training1">## TRAINING PACK GENERATION — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Feature / Epic being trained:**
+[Paste epic title and goal]
+
+**Target Audience:**
+[Choose: Financial Investigators (1LoD) / Compliance Officers (2LoD) / System Admins / All users]
+
+**Technical Context (optional — paste if available):**
+[Paste relevant design doc excerpts, Confluence page snippets, or API/workflow descriptions]
+
+**Go-live Date:**
+[When will this feature be available?]
+
+---
+
+Generate a complete training pack with the following structure:
+
+**MODULE 1: OVERVIEW**
+- What is this feature and why does it exist?
+- Where does it sit in the FCIP investigation workflow?
+- Regulatory/compliance context (why this matters for AML/SAR obligations)
+
+**MODULE 2: HOW IT WORKS — STEP BY STEP**
+- Numbered walkthrough of the feature from the user's perspective
+- Include: what triggers the workflow, key screens/actions, expected outputs
+- Note any approval or compliance steps that cannot be bypassed
+
+**MODULE 3: EDGE CASES & EXCEPTION HANDLING**
+- What should the user do if [X] happens?
+- Common mistakes to avoid
+- When to escalate to compliance or a senior investigator
+
+**MODULE 4: COMPLIANCE & AUDIT OBLIGATIONS**
+- What is recorded in the audit log?
+- What are the user's regulatory responsibilities when using this feature?
+- SAR/DAML implications (if applicable)
+
+**MODULE 5: KNOWLEDGE CHECK**
+- 5 multiple-choice questions to validate understanding
+- Include correct answers with explanations
+
+**MODULE 6: QUICK REFERENCE CARD**
+- One-page summary: key steps, key terms, who to contact for issues
+
+**Format:** Suitable for Confluence publishing. Use headings, tables, and callout boxes (note/warning/tip) where appropriate.</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-training1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-training1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ USER COMMUNICATIONS ══ -->
+    <div id="comms" style="scroll-margin-top: 80px;">
+      <div class="section-header">
+        <span class="section-title">User Communications</span>
+        <span class="section-count">2 prompts</span>
+      </div>
+      <div class="prompt-grid">
+
+        <div class="prompt-card" style="--tier-color: var(--tier2)" data-tier="2" data-tags="communications go-live release">
+          <div class="card-meta">
+            <div class="card-title">Go-Live User Communication</div>
+            <span class="card-tier tier-pill t2">Tier 2</span>
+          </div>
+          <p class="card-desc">Produces multi-channel release comms (email, Confluence, in-app banner) for feature launches — calibrated for investigator and compliance audiences.</p>
+          <div class="card-tags">
+            <span class="tag">communications</span><span class="tag">go-live</span><span class="tag">release-notes</span>
+          </div>
+          <div class="prompt-text" id="pt-comms1">## GO-LIVE USER COMMUNICATION — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Feature(s) going live:**
+[Paste feature names and brief descriptions]
+
+**Go-live Date:**
+[Date and time if applicable, including timezone]
+
+**Audience(s):**
+[e.g. All Financial Investigators, Compliance Officers, Team Leads, System Admins]
+
+**Any known limitations or caveats at go-live:**
+[e.g. "Document upload limited to PDFs only in v1", "Feature not yet available in APAC region"]
+
+**Training resources available:**
+[e.g. Confluence training page URL, recorded walkthrough, etc.]
+
+---
+
+Generate the following communication assets:
+
+**1. Email Announcement**
+- Subject line (clear, not marketing-speak)
+- Body: what's new, why it matters for their investigation workflow, what action is required
+- Tone: professional, direct — investigators are compliance professionals not consumers
+- Length: scannable, max 300 words
+- Sign-off: from the FCIP Product Team
+
+**2. Confluence Release Notes Entry**
+- Standard release notes format: Feature | Description | Affected Users | Go-live Date
+- Include any configuration steps or prerequisites
+- Link hooks for training material
+
+**3. In-App Notification / Banner Text**
+- Max 2 sentences, action-oriented
+- Include a "Learn more" link placeholder
+
+**4. Team Lead Briefing Note**
+- Slightly more detailed — covers compliance implications, any workflow changes, and guidance on communicating to their teams
+- Include: "What to tell your team", "Questions investigators may ask", "Escalation path for issues"
+
+**5. Compliance Officer Summary**
+- What regulatory/audit obligations does this feature touch?
+- Are there any new processes or sign-off requirements?
+- What is logged and auditable?</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-comms1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-comms1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+        <div class="prompt-card" style="--tier-color: var(--tier2)" data-tier="2" data-tags="release notes changelog">
+          <div class="card-meta">
+            <div class="card-title">Release Notes Generator</div>
+            <span class="card-tier tier-pill t2">Tier 2</span>
+          </div>
+          <p class="card-desc">Converts a sprint's completed stories into polished, user-facing release notes across technical and non-technical audiences — ready for Confluence or email.</p>
+          <div class="card-tags">
+            <span class="tag">release-notes</span><span class="tag">changelog</span><span class="tag">documentation</span>
+          </div>
+          <div class="prompt-text" id="pt-release1">## RELEASE NOTES GENERATOR — FCIP
+
+[PASTE CONTEXT BLOCK ABOVE FIRST]
+
+**Release / Sprint:**
+[e.g. FCIP Release 2.4 | Sprint 15 | June 2026]
+
+**Completed Stories (paste from Jira done column):**
+[List: Story ID | Title | Brief technical description]
+Example:
+- FCIP-205: Case timeline view — investigators can see all events on a chronological timeline
+- FCIP-206: Audit log on case state changes — every transition logged with user, timestamp, reason
+- FCIP-207: SAR draft save — drafts auto-save every 30 seconds, manual save available
+- FCIP-208: Case queue assignment — leads can assign cases to investigator sub-queues
+
+**Bug fixes / improvements (if any):**
+[List or leave blank]
+
+**Known issues / limitations in this release:**
+[List or state "None"]
+
+---
+
+**Generate release notes in three formats:**
+
+**FORMAT A — Technical Release Notes (for engineering & ops)**
+- Standard changelog format: New Features / Improvements / Bug Fixes / Known Issues
+- Include story IDs as references
+- Note any database migrations, config changes, or infrastructure updates
+
+**FORMAT B — User-Facing Release Notes (for investigators & compliance officers)**
+- Plain English, no Jira IDs
+- Group by user journey impact: Investigation Workflow / Case Management / Reporting & SAR / Administration
+- Lead with the benefit, not the technical implementation
+- "What's new for you" framing
+
+**FORMAT C — Executive Summary (for stakeholders & steering)**
+- 3–5 bullet points only
+- Focus on regulatory/compliance progress, investigator efficiency gains, and milestone progress
+- Note any features with direct impact on audit readiness or regulatory deadlines
+
+**FORMAT D — Confluence Page Structure**
+- H1: FCIP Release Notes — [Version] — [Date]
+- H2 sections for each format above
+- Status table at top: Release Version | Date | Status | Release Manager</div>
+          <div class="card-actions">
+            <button class="btn-copy" onclick="copyPrompt('pt-release1', this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPY
+            </button>
+            <button class="btn-expand" onclick="toggleExpand('pt-release1', this)">EXPAND ↓</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  Copied to clipboard
+</div>
+
+<script>
+let activeFilter = 'all';
+
+  function copyPrompt(id, btn) {
+    const el = document.getElementById(id);
+    const text = el.innerText || el.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> COPIED';
+      showToast();
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> COPY';
+      }, 2500);
+    });
+  }
+
+  function copyContext() {
+    const el = document.getElementById('contextBlock');
+    navigator.clipboard.writeText(el.innerText).then(showToast);
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function toggleExpand(id, btn) {
+    const el = document.getElementById(id);
+    const expanded = el.classList.toggle('expanded');
+    btn.textContent = expanded ? 'COLLAPSE ↑' : 'EXPAND ↓';
+  }
+
+  function filterTier(tier, btn) {
+    activeFilter = tier;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function filterPrompts() {
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.prompt-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+      const tierMatch = activeFilter === 'all' || card.dataset.tier === activeFilter;
+      const tags = (card.dataset.tags || '').toLowerCase();
+      const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+      const desc = card.querySelector('.card-desc')?.textContent.toLowerCase() || '';
+      const textMatch = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
+
+      if (tierMatch && textMatch) {
+        card.classList.remove('hidden');
+        visible++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('resultCount').textContent = `${visible} prompt${visible !== 1 ? 's' : ''}`;
+  }
+
+  function navTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Sidebar active state on scroll
+  const sectionIds = ['context','epics','stories','dor','acs','splitting','nfr','backlog','sprint-goal','retro','sprint-planning','roadmap','stakeholder','training','comms'];
+
+  function updateSidebarActive() {
+    let current = sectionIds[0];
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 120) current = id;
+    });
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      const onclick = link.getAttribute('onclick') || '';
+      const match = onclick.match(/navTo\('([^']+)'\)/);
+      if (match) link.classList.toggle('active', match[1] === current);
+    });
+  }
+
+  window.addEventListener('scroll', updateSidebarActive, { passive: true });
+  updateSidebarActive();
+</script>
+</body>
+</html>
